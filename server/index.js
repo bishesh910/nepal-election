@@ -118,48 +118,45 @@ function parseCandidatesFromHtml(html, meta) {
   const $ = cheerio.load(html);
   const candidates = [];
 
-  // Try to find candidate cards/rows - ekantipur uses Bootstrap cards
-  // Look for patterns: name + votes + party + status
-  $('[class*="candidate"], [class*="result"], .card, table tbody tr').each((i, el) => {
-    const text = $(el).text().trim();
-    const name = $(el).find('[class*="name"], h5, h6, strong, td:nth-child(1)').first().text().trim();
-    const party = $(el).find('[class*="party"], [class*="Party"], td:nth-child(2)').first().text().trim();
-    const votes = $(el).find('[class*="vote"], [class*="count"], td:nth-child(3)').first().text().trim();
-    const status = $(el).find('[class*="status"], [class*="win"], [class*="lead"]').first().text().trim();
-
-    if (name && name.length > 2 && name.length < 80) {
+  // ekantipur renders candidate rows with specific class patterns
+  // Try structured selectors first
+  $('table tbody tr').each((i, el) => {
+    const tds = $(el).find('td');
+    if (tds.length < 3) return;
+    const name = $(tds[0]).text().trim();
+    const party = $(tds[1]).text().trim();
+    const votesRaw = $(tds[2]).text().replace(/,/g, '').trim();
+    const votes = parseInt(votesRaw) || 0;
+    const status = $(tds[3] || tds[2]).text().trim();
+    if (name && name.length > 2 && name.length < 80 && !/^\d+$/.test(name)) {
       candidates.push({
-        name,
-        party: party || 'Unknown',
-        votes: parseInt(votes.replace(/,/g, '')) || 0,
-        status: status || '',
-        constituency: meta.constituency,
-        district: meta.district,
-        province: meta.province,
+        name, party: party || null,
+        votes, status: status || '',
+        constituency: meta.constituency, district: meta.district, province: meta.province,
       });
     }
   });
 
-  // Fallback: parse raw text for vote counts
+  // Try card/div-based layout
   if (candidates.length === 0) {
-    const bodyText = $('body').text();
-    // Pattern: "Name Party 12345 votes"
-    const votePattern = /([A-Za-z\s\.]+)\s+([A-Za-z\s\-]+(?:Party|Congress|UML|RSP|Maoist|Samajbadi|Prajatantra|Swatantra|Janamat|Sanskriti|Mukti|Unmukti|Others)[A-Za-z\s]*)\s+([\d,]+)/gi;
-    let m;
-    while ((m = votePattern.exec(bodyText)) !== null) {
-      candidates.push({
-        name: m[1].trim(),
-        party: m[2].trim(),
-        votes: parseInt(m[3].replace(/,/g, '')) || 0,
-        status: '',
-        constituency: meta.constituency,
-        district: meta.district,
-        province: meta.province,
-      });
-    }
+    $('[class*="candidate"],[class*="result-row"],[class*="cand-row"]').each((i, el) => {
+      const name = $(el).find('[class*="name"],[class*="cand-name"],h5,h6').first().text().trim();
+      const party = $(el).find('[class*="party"],[class*="party-name"]').first().text().trim();
+      const votesRaw = $(el).find('[class*="vote"],[class*="count"],[class*="total"]').first().text().replace(/,/g,'').trim();
+      const votes = parseInt(votesRaw) || 0;
+      const status = $(el).find('[class*="status"],[class*="win"],[class*="lead"]').first().text().trim();
+      if (name && name.length > 2 && name.length < 80) {
+        candidates.push({
+          name, party: party || null,
+          votes, status,
+          constituency: meta.constituency, district: meta.district, province: meta.province,
+        });
+      }
+    });
   }
 
-  return candidates;
+  // Mark as Unknown only if truly no party found (not empty string from wrong selector)
+  return candidates.map(c => ({ ...c, party: c.party || 'Unknown' }));
 }
 
 // ─── Fetch one constituency page ─────────────────────────────────────────────
@@ -190,16 +187,29 @@ async function fetchPopularCandidates() {
     
     // Find all candidate rows - look for vote number patterns  
     // Common pattern on such pages: Rank | Name | Party | Votes | Lead/Win | Constituency
-    $('tr, [class*="candidate-row"], [class*="cand"], .row > div').each((i, el) => {
-      const cells = $(el).find('td, [class*="col"]');
-      if (cells.length >= 3) {
-        const name = $(cells[0]).text().trim() || $(cells[1]).text().trim();
-        const party = $(cells[1]).text().trim() || $(cells[2]).text().trim();
-        const votesText = $(cells).filter((_, c) => /^\d[\d,]+$/.test($(c).text().trim())).first().text().trim();
-        const votes = parseInt(votesText.replace(/,/g, '')) || 0;
-        if (name && name.length > 2 && name.length < 80 && votes > 0) {
-          candidates.push({ name, party, votes, status: '', constituency: '', district: '', province: '' });
-        }
+    $('tr').each((i, el) => {
+      const tds = $(el).find('td');
+      if (tds.length < 4) return;
+      // Popular candidates table: rank | name | party | votes | constituency
+      const rank = $(tds[0]).text().trim();
+      if (!/^\d+$/.test(rank)) return; // skip header rows
+      const name = $(tds[1]).text().trim();
+      const party = $(tds[2]).text().trim();
+      const votesRaw = $(tds[3]).text().replace(/,/g,'').trim();
+      const votes = parseInt(votesRaw) || 0;
+      const constituency = $(tds[4] || tds[3]).text().trim();
+      if (name && name.length > 2 && name.length < 80 && votes > 0) {
+        candidates.push({ name, party: party || 'Unknown', votes, status: '', constituency, district: '', province: '' });
+      }
+    });
+    // Also try card layout
+    $('[class*="popular"],[class*="top-cand"],[class*="candidate-card"]').each((i, el) => {
+      const name = $(el).find('[class*="name"],h5,h6,strong').first().text().trim();
+      const party = $(el).find('[class*="party"]').first().text().trim();
+      const votesRaw = $(el).find('[class*="vote"],[class*="count"]').first().text().replace(/,/g,'').trim();
+      const votes = parseInt(votesRaw) || 0;
+      if (name && name.length > 2 && votes > 0) {
+        candidates.push({ name, party: party || 'Unknown', votes, status: '', constituency: '', district: '', province: '' });
       }
     });
 
