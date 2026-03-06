@@ -4,491 +4,731 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nepal Election 2082 — Live Results</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@300;400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --red: #DC2626;
-    --crimson: #9B1C1C;
-    --ink: #0F0F0F;
-    --paper: #F5F0E8;
-    --cream: #EDE8DC;
-    --gold: #B5830A;
-    --muted: #6B6560;
-    --border: #C8C0B0;
-    --green: #15803D;
-    --blue: #1D4ED8;
-  }
+:root {
+  --bg: #0A0A0F;
+  --surface: #111118;
+  --surface2: #18181F;
+  --border: #222230;
+  --border2: #2A2A3A;
+  --text: #E8E8F0;
+  --muted: #5A5A70;
+  --muted2: #3A3A50;
+  --red: #E63946;
+  --red-dim: rgba(230,57,70,0.12);
+  --gold: #F4A427;
+  --gold-dim: rgba(244,164,39,0.1);
+  --green: #2DC653;
+  --green-dim: rgba(45,198,83,0.1);
+  --blue: #4895EF;
+  --blue-dim: rgba(72,149,239,0.1);
+  --accent: #E63946;
+}
 
-  html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  body {
-    background: var(--ink);
-    color: var(--paper);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* ─── NOISE TEXTURE OVERLAY ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
 
-  /* TICKER */
-  .ticker-wrap {
-    background: var(--red);
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 8px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 3px solid #FF4444;
-  }
-  .ticker-label {
-    display: inline-block;
-    background: var(--ink);
-    color: var(--paper);
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
-    padding: 0 18px;
-    font-size: 15px;
-    margin-right: 20px;
-    vertical-align: middle;
-  }
-  .ticker-track {
-    display: inline-block;
-    animation: ticker 60s linear infinite;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-    vertical-align: middle;
-  }
-  @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+/* ─── TICKER ─── */
+.ticker {
+  background: var(--red);
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+.ticker-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  padding: 0 20px;
+  white-space: nowrap;
+  background: rgba(0,0,0,0.3);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+.ticker-scroll {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.ticker-track {
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  animation: scroll-ticker 80s linear infinite;
+  padding-left: 100%;
+}
+@keyframes scroll-ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
 
-  /* HEADER */
-  header {
-    padding: 0;
-    border-bottom: 1px solid #2A2A2A;
-    position: relative;
-    overflow: hidden;
-  }
-  .header-bg {
-    position: absolute;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(220,38,38,0.08) 0%, transparent 70%),
-      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px);
-  }
-  .header-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 32px 32px;
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 24px;
-  }
-  .flag-stripe {
-    display: flex;
-    gap: 0;
-    margin-bottom: 20px;
-    width: 48px;
-    height: 4px;
-  }
-  .flag-stripe span { flex: 1; }
-  .flag-stripe span:nth-child(1) { background: #DC143C; }
-  .flag-stripe span:nth-child(2) { background: #FFFFFF; }
-  .flag-stripe span:nth-child(3) { background: #003893; }
+/* ─── HEADER ─── */
+header {
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.header-glow {
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(230,57,70,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 48px 48px 40px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 32px;
+}
+.nepal-flag {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 24px;
+}
+.nepal-flag span {
+  height: 3px;
+  width: 28px;
+  border-radius: 2px;
+}
+.f1 { background: #DC143C; }
+.f2 { background: #FFFFFF; opacity: 0.6; }
+.f3 { background: #003893; }
 
-  h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(40px, 7vw, 88px);
-    line-height: 0.92;
-    letter-spacing: -1px;
-    color: var(--paper);
-  }
-  h1 span.accent { color: var(--red); }
-  .subtitle {
-    font-family: 'Noto Serif', serif;
-    font-style: italic;
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 12px;
-    letter-spacing: 0.3px;
-  }
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px, 6vw, 96px);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -2px;
+  color: var(--text);
+}
+h1 em {
+  font-style: italic;
+  color: var(--red);
+}
+.tagline {
+  font-family: 'Source Serif 4', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 16px;
+  letter-spacing: 0.2px;
+}
 
-  .live-badge {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-  }
-  .live-dot {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 3px;
-    font-size: 16px;
-    color: var(--red);
-  }
-  .live-dot::before {
-    content: '';
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--red);
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.7); }
-  }
-  .meta-info {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-    line-height: 1.8;
-  }
-  .meta-info strong { color: var(--paper); }
+.live-panel {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--red);
+  font-weight: 500;
+}
+.live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 0 rgba(230,57,70,0.4);
+  animation: live-pulse 2s ease infinite;
+}
+@keyframes live-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(230,57,70,0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(230,57,70,0); }
+  100% { box-shadow: 0 0 0 0 rgba(230,57,70,0); }
+}
+.timestamp {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.8;
+  text-align: right;
+}
+.timestamp strong { color: var(--text); display: block; font-size: 13px; }
 
-  /* LAYOUT */
-  main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 32px 80px;
-  }
+/* ─── MAIN ─── */
+main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 48px 100px;
+}
 
-  /* STATUS BAR */
-  .status-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #171717;
-    border: 1px solid #2A2A2A;
-    padding: 12px 20px;
-    margin-bottom: 32px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .status-bar .countdown { color: var(--gold); font-weight: 500; }
-  .refresh-btn {
-    background: none;
-    border: 1px solid #3A3A3A;
-    color: var(--paper);
-    padding: 4px 14px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-  }
-  .refresh-btn:hover { background: #2A2A2A; border-color: #555; }
+/* ─── CONTROLS ─── */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.status .ok { color: var(--green); }
+.status .err { color: var(--red); }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--muted);
+  border-radius: 2px;
+}
+.pill.gold { border-color: rgba(244,164,39,0.3); color: var(--gold); background: var(--gold-dim); }
+.pill.green { border-color: rgba(45,198,83,0.3); color: var(--green); background: var(--green-dim); }
 
-  /* SECTION LABEL */
-  .section-label {
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 4px;
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: #2A2A2A; }
+.ctrl-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.countdown-ring {
+  position: relative;
+  width: 32px; height: 32px;
+}
+.countdown-ring svg {
+  transform: rotate(-90deg);
+}
+.countdown-ring .track { stroke: var(--border2); fill: none; }
+.countdown-ring .prog { fill: none; stroke: var(--red); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.countdown-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: var(--muted);
+}
+.btn-refresh {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 7px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+.btn-refresh:hover { background: var(--surface); border-color: var(--red); color: var(--red); }
 
-  /* PARTY TABLE */
-  .party-table-wrap {
-    margin-bottom: 48px;
-    overflow-x: auto;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  thead th {
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
-    font-size: 12px;
-    color: var(--muted);
-    text-align: left;
-    padding: 10px 16px;
-    border-bottom: 1px solid #2A2A2A;
-  }
-  thead th.num { text-align: right; }
-  tbody tr {
-    border-bottom: 1px solid #1C1C1C;
-    transition: background 0.15s;
-  }
-  tbody tr:hover { background: #171717; }
-  tbody td {
-    padding: 14px 16px;
-    vertical-align: middle;
-  }
-  .rank-cell {
-    font-size: 11px;
-    color: #3A3A3A;
-    width: 32px;
-  }
-  .party-name-cell {
-    font-family: 'Noto Serif', serif;
-    font-size: 15px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .party-color-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .num-cell {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  .won-cell { color: var(--green); font-weight: 500; }
-  .lead-cell { color: var(--gold); }
-  .total-cell { color: var(--paper); font-weight: 600; }
+/* ─── TABS ─── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+.tab {
+  padding: 10px 24px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'JetBrains Mono', monospace;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--red); }
 
-  .bar-cell { width: 120px; }
-  .bar-wrap {
-    height: 4px;
-    background: #2A2A2A;
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.8s ease;
-  }
+/* ─── OVERVIEW PANEL ─── */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
 
-  /* EMPTY STATE */
-  .empty-state {
-    padding: 60px 0;
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 2;
-  }
-  .empty-state strong { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: #3A3A3A; margin-bottom: 8px; }
+/* Party leaderboard */
+.leaderboard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-title {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.party-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 60px 60px 70px 140px;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.party-row:hover { background: var(--surface2); }
+.party-row:last-child { border-bottom: none; }
+.party-rank { font-size: 11px; color: var(--muted2); text-align: center; }
+.party-name-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+.party-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.party-name { font-family: 'Source Serif 4', serif; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.party-won { font-size: 14px; color: var(--green); font-weight: 500; text-align: right; }
+.party-leading { font-size: 14px; color: var(--gold); text-align: right; }
+.party-total { font-size: 15px; font-weight: 500; text-align: right; }
+.party-bar-wrap {
+  height: 3px;
+  background: var(--border2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.party-bar { height: 100%; border-radius: 2px; transition: width 1s ease; }
 
-  /* RAW DATA PANEL */
-  .raw-panel {
-    background: #111;
-    border: 1px solid #2A2A2A;
-    padding: 24px;
-    margin-bottom: 48px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  .raw-panel pre {
-    font-size: 12px;
-    color: #7A7A6A;
-    white-space: pre-wrap;
-    word-break: break-word;
-    line-height: 1.8;
-  }
+.party-header {
+  display: grid;
+  grid-template-columns: 24px 1fr 60px 60px 70px 140px;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.party-header span { font-size: 9px; letter-spacing: 2px; color: var(--muted2); }
+.party-header .r { text-align: right; }
 
-  /* NEWS */
-  .news-grid {
-    display: grid;
-    gap: 12px;
-  }
-  .news-item {
-    background: #111;
-    border-left: 3px solid var(--red);
-    padding: 14px 18px;
-    font-family: 'Noto Serif', serif;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #CCC;
-    animation: fadeIn 0.5s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* Stats sidebar */
+.stats-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px;
+}
+.stat-label { font-size: 9px; letter-spacing: 3px; color: var(--muted); margin-bottom: 10px; }
+.stat-value { font-family: 'Playfair Display', serif; font-size: 42px; line-height: 1; color: var(--text); }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
-  /* SOURCE NOTE */
-  .source-note {
-    margin-top: 48px;
-    padding-top: 24px;
-    border-top: 1px solid #1C1C1C;
-    font-size: 11px;
-    color: #3A3A3A;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .source-note a { color: #555; text-decoration: underline; }
+.top3 { display: flex; flex-direction: column; gap: 10px; }
+.top3-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+.top3-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.top3-name { font-family: 'Source Serif 4', serif; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top3-num { font-size: 18px; font-weight: 500; }
 
-  /* LOADING SPINNER */
-  .spinner {
-    display: inline-block;
-    width: 16px; height: 16px;
-    border: 2px solid #2A2A2A;
-    border-top-color: var(--red);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* ─── DISTRICTS TAB ─── */
+.district-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.district-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+.district-card:hover { border-color: var(--border2); }
+.district-header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.district-name {
+  font-family: 'Source Serif 4', serif;
+  font-size: 15px;
+  font-weight: 400;
+}
+.district-meta { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.district-parties { padding: 8px 0; }
+.dp-row {
+  display: grid;
+  grid-template-columns: 1fr 44px 44px;
+  padding: 6px 16px;
+  font-size: 12px;
+  gap: 8px;
+  align-items: center;
+  transition: background 0.1s;
+}
+.dp-row:hover { background: var(--surface2); }
+.dp-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #BBB; }
+.dp-won { text-align: right; color: var(--green); font-weight: 500; }
+.dp-lead { text-align: right; color: var(--gold); }
+.dp-header {
+  display: grid;
+  grid-template-columns: 1fr 44px 44px;
+  padding: 4px 16px 6px;
+  font-size: 9px;
+  gap: 8px;
+  letter-spacing: 2px;
+  color: var(--muted2);
+  border-bottom: 1px solid var(--border);
+}
+.dp-header span:last-child, .dp-header span:nth-child(2) { text-align: right; }
 
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .header-inner { grid-template-columns: 1fr; }
-    .live-badge { align-items: flex-start; }
-    main { padding: 24px 16px 60px; }
-    .bar-cell { display: none; }
-  }
+/* ─── LOADING ─── */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 16px;
+  color: var(--muted);
+}
+.spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 11px; letter-spacing: 2px; }
+
+/* ─── LEGEND ─── */
+.legend { display: flex; gap: 24px; flex-wrap: wrap; padding: 16px 0; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.legend-dot { width: 8px; height: 8px; border-radius: 1px; }
+.l-won { background: var(--green); }
+.l-lead { background: var(--gold); }
+
+/* ─── EMPTY ─── */
+.empty { padding: 48px; text-align: center; color: var(--muted); font-size: 12px; line-height: 2; }
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 48px;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted2);
+}
+footer a { color: var(--muted); text-decoration: underline; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .header-inner { grid-template-columns: 1fr; padding: 32px 24px 28px; }
+  .live-panel { align-items: flex-start; }
+  main { padding: 24px 20px 60px; }
+  .overview-grid { grid-template-columns: 1fr; }
+  .party-row { grid-template-columns: 20px 1fr 50px 50px 60px; }
+  .party-row .party-bar-wrap { display: none; }
+  .party-header { grid-template-columns: 20px 1fr 50px 50px 60px; }
+  .party-header span:last-child { display: none; }
+  footer { padding: 20px 24px; flex-direction: column; gap: 8px; }
+}
+
+/* fade-in animation */
+.fade-in { animation: fadein 0.4s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
 
 <!-- TICKER -->
-<div class="ticker-wrap">
-  <span class="ticker-label">BREAKING</span>
-  <span class="ticker-track" id="tickerText">Loading live updates...</span>
+<div class="ticker">
+  <div class="ticker-label">LIVE</div>
+  <div class="ticker-scroll">
+    <div class="ticker-track" id="tickerTrack">Loading election data...</div>
+  </div>
 </div>
 
 <!-- HEADER -->
 <header>
-  <div class="header-bg"></div>
+  <div class="header-glow"></div>
   <div class="header-inner">
     <div>
-      <div class="flag-stripe"><span></span><span></span><span></span></div>
-      <h1>Nepal<br>Election <span class="accent">2082</span></h1>
-      <p class="subtitle">Federal Parliament — Live counting results from election.ekantipur.com</p>
+      <div class="nepal-flag">
+        <span class="f1"></span><span class="f2"></span><span class="f3"></span>
+      </div>
+      <h1>Nepal<br>Election <em>2082</em></h1>
+      <p class="tagline">Federal Parliament — live counting results</p>
     </div>
-    <div class="live-badge">
-      <div class="live-dot">LIVE</div>
-      <div class="meta-info" id="metaInfo">
-        <strong>—</strong><br>
-        Loading...
+    <div class="live-panel">
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+      <div class="timestamp">
+        <strong id="hdrDate">—</strong>
+        <span id="hdrTime">Connecting...</span>
       </div>
     </div>
   </div>
 </header>
 
 <main>
-
-  <!-- STATUS BAR -->
-  <div class="status-bar">
-    <span id="statusLeft">⏳ Connecting to data source...</span>
-    <span>
-      Next refresh in <span class="countdown" id="countdown">30s</span>
-      &nbsp;&nbsp;
-      <button class="refresh-btn" onclick="fetchNow()">↺ REFRESH</button>
-    </span>
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="status">
+      <span id="statusMsg" class="ok">Connecting...</span>
+      <span class="pill gold" id="districtPill">0 districts</span>
+      <span class="pill green" id="seatsPill">0 seats reported</span>
+    </div>
+    <div class="ctrl-right">
+      <div class="countdown-ring">
+        <svg width="32" height="32" viewBox="0 0 32 32">
+          <circle class="track" cx="16" cy="16" r="13" stroke-width="2"/>
+          <circle class="prog" id="cdRing" cx="16" cy="16" r="13" stroke-width="2"
+            stroke-dasharray="81.68" stroke-dashoffset="0"/>
+        </svg>
+        <div class="countdown-num" id="cdNum">30</div>
+      </div>
+      <button class="btn-refresh" onclick="fetchNow()">↺ REFRESH</button>
+    </div>
   </div>
 
-  <!-- PARTY RESULTS -->
-  <div class="section-label">PARTY STANDINGS</div>
-  <div class="party-table-wrap" id="partySection">
-    <div class="empty-state"><span class="spinner"></span> Fetching results...</div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('overview', this)">OVERVIEW</button>
+    <button class="tab" onclick="switchTab('districts', this)">DISTRICTS</button>
   </div>
 
-  <!-- RAW DATA (shown if structured data is sparse) -->
-  <div id="rawSection" style="display:none;">
-    <div class="section-label">RAW DATA FROM SOURCE</div>
-    <div class="raw-panel"><pre id="rawContent"></pre></div>
+  <!-- OVERVIEW TAB -->
+  <div id="tab-overview">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot l-won"></div> Won</div>
+      <div class="legend-item"><div class="legend-dot l-lead"></div> Leading</div>
+    </div>
+    <div class="overview-grid">
+      <!-- Leaderboard -->
+      <div class="leaderboard">
+        <div class="panel-header">
+          <span class="panel-title">PARTY STANDINGS</span>
+          <span style="font-size:10px;color:var(--muted)" id="partyCount">—</span>
+        </div>
+        <div class="party-header">
+          <span>#</span>
+          <span>PARTY</span>
+          <span class="r">WON</span>
+          <span class="r">LEAD</span>
+          <span class="r">TOTAL</span>
+          <span></span>
+        </div>
+        <div id="partyList">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <div class="loading-text">FETCHING DATA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="stats-sidebar">
+        <div class="stat-card">
+          <div class="stat-label">DISTRICTS REPORTING</div>
+          <div class="stat-value" id="statDistricts">—</div>
+          <div class="stat-sub" id="statDistrictsSub">Loading...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SEATS REPORTED</div>
+          <div class="stat-value" id="statSeats">—</div>
+          <div class="stat-sub">seats counted so far</div>
+        </div>
+        <div class="stat-card" id="top3Card" style="display:none">
+          <div class="stat-label">TOP 3 PARTIES</div>
+          <div class="top3" id="top3List"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- NEWS -->
-  <div id="newsSection" style="display:none;">
-    <div class="section-label">UPDATES</div>
-    <div class="news-grid" id="newsGrid"></div>
-  </div>
-
-  <div class="source-note">
-    <span>Data source: <a href="https://election.ekantipur.com/?lng=eng" target="_blank">election.ekantipur.com</a> — refreshed every 30 seconds via proxy server</span>
-    <span id="lastUpdated">—</span>
+  <!-- DISTRICTS TAB -->
+  <div id="tab-districts" style="display:none">
+    <div class="district-grid" id="districtGrid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">LOADING DISTRICTS</div>
+      </div>
+    </div>
   </div>
 </main>
 
+<footer>
+  <span>Data source: <a href="https://election.ekantipur.com/?lng=eng" target="_blank">election.ekantipur.com</a> — proxied &amp; refreshed every 30s</span>
+  <span id="footerTime">—</span>
+</footer>
+
 <script>
-const PARTY_COLORS = [
-  '#DC2626','#1D4ED8','#15803D','#D97706','#7C3AED',
-  '#DB2777','#0891B2','#65A30D','#EA580C','#6366F1',
-  '#0D9488','#F59E0B','#4F46E5','#10B981','#F97316',
+const COLORS = [
+  '#E63946','#4895EF','#2DC653','#F4A427','#A855F7',
+  '#EC4899','#06B6D4','#84CC16','#F97316','#6366F1',
+  '#14B8A6','#EAB308','#8B5CF6','#10B981','#FB923C',
+  '#3B82F6','#22C55E','#F59E0B','#EF4444','#8B5CF6',
 ];
+const colorMap = {};
+function partyColor(name) {
+  if (!colorMap[name]) {
+    const idx = Object.keys(colorMap).length % COLORS.length;
+    colorMap[name] = COLORS[idx];
+  }
+  return colorMap[name];
+}
 
-let countdownVal = 30;
+let countdown = 30;
 let intervalId = null;
-let fetchedOnce = false;
+const CIRCUMFERENCE = 2 * Math.PI * 13; // ~81.68
 
-function fmt(n) {
-  const num = parseInt(n);
-  if (isNaN(num)) return n || '—';
-  return num.toLocaleString();
+function setCountdown(val) {
+  countdown = val;
+  document.getElementById('cdNum').textContent = val;
+  const offset = CIRCUMFERENCE * (1 - val / 30);
+  document.getElementById('cdRing').style.strokeDashoffset = offset;
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-overview').style.display = name === 'overview' ? '' : 'none';
+  document.getElementById('tab-districts').style.display = name === 'districts' ? '' : 'none';
 }
 
 function renderParties(parties) {
-  if (!parties || parties.length === 0) return null;
+  if (!parties || parties.length === 0) {
+    document.getElementById('partyList').innerHTML = '<div class="empty">No party data yet</div>';
+    return;
+  }
+  document.getElementById('partyCount').textContent = `${parties.length} parties`;
+  const maxTotal = Math.max(...parties.map(p => p.total), 1);
 
-  const maxTotal = Math.max(...parties.map(p => parseInt(p.total) || parseInt(p.won) || 0), 1);
-
-  const rows = parties.map((p, i) => {
-    const total = parseInt(p.total) || (parseInt(p.won) || 0) + (parseInt(p.leading) || 0);
-    const pct = Math.round((total / maxTotal) * 100);
-    const color = PARTY_COLORS[i % PARTY_COLORS.length];
-    return `
-      <tr>
-        <td class="rank-cell">${i + 1}</td>
-        <td>
-          <div class="party-name-cell">
-            <span class="party-color-dot" style="background:${color}"></span>
-            ${p.name}
-          </div>
-        </td>
-        <td class="num-cell won-cell">${fmt(p.won)}</td>
-        <td class="num-cell lead-cell">${fmt(p.leading)}</td>
-        <td class="num-cell total-cell">${fmt(total) !== '0' ? fmt(total) : fmt(p.won)}</td>
-        <td class="bar-cell">
-          <div class="bar-wrap">
-            <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
-          </div>
-        </td>
-      </tr>`;
+  const html = parties.map((p, i) => {
+    const color = partyColor(p.name);
+    const pct = Math.round((p.total / maxTotal) * 100);
+    return `<div class="party-row fade-in">
+      <div class="party-rank">${i + 1}</div>
+      <div class="party-name-wrap">
+        <div class="party-dot" style="background:${color}"></div>
+        <div class="party-name" title="${p.name}">${p.name}</div>
+      </div>
+      <div class="party-won">${p.won}</div>
+      <div class="party-leading">${p.leading}</div>
+      <div class="party-total">${p.total}</div>
+      <div class="party-bar-wrap">
+        <div class="party-bar" style="width:${pct}%;background:${color}"></div>
+      </div>
+    </div>`;
   }).join('');
+  document.getElementById('partyList').innerHTML = html;
 
-  return `
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Party</th>
-          <th class="num">Won</th>
-          <th class="num">Leading</th>
-          <th class="num">Total</th>
-          <th class="num">Share</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  // Top 3
+  const top3 = parties.slice(0, 3);
+  if (top3.length > 0) {
+    document.getElementById('top3Card').style.display = '';
+    document.getElementById('top3List').innerHTML = top3.map(p => `
+      <div class="top3-item">
+        <div class="top3-dot" style="background:${partyColor(p.name)}"></div>
+        <div class="top3-name" title="${p.name}">${p.name}</div>
+        <div class="top3-num" style="color:${partyColor(p.name)}">${p.total}</div>
+      </div>`).join('');
+  }
 }
 
-function renderNews(newsItems) {
-  if (!newsItems || newsItems.length === 0) return;
-  document.getElementById('newsSection').style.display = 'block';
-  document.getElementById('newsGrid').innerHTML = newsItems
-    .map(n => `<div class="news-item">${n}</div>`)
-    .join('');
+function renderDistricts(districts) {
+  if (!districts || districts.length === 0) {
+    document.getElementById('districtGrid').innerHTML = '<div class="empty">No district data yet</div>';
+    return;
+  }
+  const html = districts.map(d => {
+    const active = d.parties.filter(p => p.total > 0);
+    const toShow = active.length > 0 ? active : d.parties.slice(0, 8);
+    const rows = toShow.map(p => `
+      <div class="dp-row">
+        <div class="dp-name" title="${p.name}">${p.name}</div>
+        <div class="dp-won">${p.won > 0 ? p.won : '—'}</div>
+        <div class="dp-lead">${p.leading > 0 ? p.leading : '—'}</div>
+      </div>`).join('');
+    return `<div class="district-card fade-in">
+      <div class="district-header">
+        <div class="district-name">${d.name}</div>
+        <div class="district-meta">${d.totalSeats} SEATS</div>
+      </div>
+      <div class="dp-header">
+        <span>PARTY</span><span>WON</span><span>LEAD</span>
+      </div>
+      <div class="district-parties">${rows}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('districtGrid').innerHTML = html;
 }
 
-function renderTicker(newsItems, parties) {
-  let texts = [];
-  if (parties && parties.length > 0) {
-    texts = parties.slice(0, 5).map(p => 
-      `${p.name.toUpperCase()} — Won: ${fmt(p.won)} | Leading: ${fmt(p.leading)}`
-    );
+function updateTicker(data) {
+  const parts = [];
+  if (data.globalParties && data.globalParties.length > 0) {
+    data.globalParties.slice(0, 6).forEach(p => {
+      parts.push(`${p.name.toUpperCase()}: ${p.won} won, ${p.leading} leading`);
+    });
   }
-  if (newsItems && newsItems.length > 0) {
-    texts = [...texts, ...newsItems.slice(0, 5)];
+  if (data.news && data.news.length > 0) {
+    parts.push(...data.news.slice(0, 4));
   }
-  if (texts.length === 0) texts = ['Live election results updating every 30 seconds'];
-  document.getElementById('tickerText').textContent = texts.join('  ·  ');
+  if (parts.length === 0) parts.push('Nepal Federal Parliament Election 2082 — Live counting in progress');
+  document.getElementById('tickerTrack').textContent = parts.join('   ·   ');
 }
 
 async function fetchData() {
@@ -496,80 +736,50 @@ async function fetchData() {
     const res = await fetch('/api/results');
     const data = await res.json();
 
-    fetchedOnce = true;
-    countdownVal = data.nextRefresh || 30;
-
-    // Update meta
-    const ft = data.fetchedAt ? new Date(data.fetchedAt) : new Date();
-    document.getElementById('metaInfo').innerHTML = 
-      `<strong>${ft.toLocaleDateString('en-NP', {day:'numeric',month:'short',year:'numeric'})}</strong><br>
-       Last pulled: ${ft.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
-    document.getElementById('lastUpdated').textContent = `Fetched at ${ft.toLocaleTimeString()}`;
+    // Header
+    const ft = new Date(data.fetchedAt);
+    document.getElementById('hdrDate').textContent = ft.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('hdrTime').textContent = `Updated ${ft.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+    document.getElementById('footerTime').textContent = `Fetched: ${ft.toLocaleTimeString()}`;
 
     // Status
-    const cacheAge = data.cacheAge !== null ? `Cache age: ${data.cacheAge}s` : '';
-    const partyCount = data.parties?.length || 0;
-    document.getElementById('statusLeft').textContent = 
-      data.error 
-        ? `⚠ Scrape error: ${data.error}` 
-        : `✓ Connected — ${partyCount} parties${cacheAge ? ` | ${cacheAge}` : ''}`;
+    const dCount = data.districts?.length || 0;
+    const seats = data.totalSeatsReported || 0;
+    document.getElementById('statusMsg').textContent = data.error ? `Error: ${data.error}` : `✓ Connected`;
+    document.getElementById('statusMsg').className = data.error ? 'err' : 'ok';
+    document.getElementById('districtPill').textContent = `${dCount} districts`;
+    document.getElementById('seatsPill').textContent = `${seats} seats reported`;
 
-    // Parties
-    const partyHtml = renderParties(data.parties);
-    if (partyHtml) {
-      document.getElementById('partySection').innerHTML = partyHtml;
-    } else {
-      document.getElementById('partySection').innerHTML = `
-        <div class="empty-state">
-          <strong>NO STRUCTURED DATA</strong>
-          The page loaded but party data couldn't be parsed.<br>
-          See raw data below. The site may use JavaScript rendering.<br>
-          <small style="color:#444;margin-top:8px;display:block">Page title: ${data.pageTitle || 'unknown'}</small>
-        </div>`;
-    }
+    // Stats
+    document.getElementById('statDistricts').textContent = dCount || '—';
+    document.getElementById('statDistrictsSub').textContent = dCount > 0 ? `of 77 total districts` : 'No data yet';
+    document.getElementById('statSeats').textContent = seats || '—';
 
-    // Raw data fallback
-    if (data.rawBlocks && data.rawBlocks.length > 0) {
-      document.getElementById('rawSection').style.display = 'block';
-      document.getElementById('rawContent').textContent = data.rawBlocks.join('\n\n---\n\n');
-    }
+    renderParties(data.globalParties);
+    renderDistricts(data.districts);
+    updateTicker(data);
 
-    // News
-    renderNews(data.news);
-    renderTicker(data.news, data.parties);
+    setCountdown(data.nextRefresh || 30);
 
   } catch (e) {
-    document.getElementById('statusLeft').textContent = `✗ Connection error: ${e.message}`;
-    if (!fetchedOnce) {
-      document.getElementById('partySection').innerHTML = `
-        <div class="empty-state">
-          <strong>CONNECTION FAILED</strong>
-          Cannot reach proxy server. Make sure the Node.js server is running.
-        </div>`;
-    }
+    document.getElementById('statusMsg').textContent = `✗ ${e.message}`;
+    document.getElementById('statusMsg').className = 'err';
   }
 }
 
 function fetchNow() {
   fetchData();
-  countdownVal = 30;
+  setCountdown(30);
 }
 
-function startCountdown() {
-  if (intervalId) clearInterval(intervalId);
-  intervalId = setInterval(() => {
-    countdownVal = Math.max(0, countdownVal - 1);
-    document.getElementById('countdown').textContent = `${countdownVal}s`;
-    if (countdownVal <= 0) {
-      fetchData();
-      countdownVal = 30;
-    }
-  }, 1000);
-}
+// Countdown ticker
+setInterval(() => {
+  const next = Math.max(0, countdown - 1);
+  setCountdown(next);
+  if (next === 0) { fetchData(); setCountdown(30); }
+}, 1000);
 
-// Boot
 fetchData();
-startCountdown();
 </script>
 </body>
 </html>
