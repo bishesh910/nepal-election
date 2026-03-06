@@ -253,17 +253,22 @@ async function fetchAllData() {
 
   console.log(`[scraper] Got ${allCandidates.length} total candidate entries from ${fetchedCount} constituencies`);
 
-  // Deduplicate and sort by votes
-  const seen = new Set();
-  const unique = allCandidates
-    .filter(c => {
-      if (!c.name || c.votes === undefined) return false;
-      const key = `${c.name}|${c.constituency}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .sort((a, b) => (b.votes || 0) - (a.votes || 0));
+  // Deduplicate: best (highest votes) per name+constituency
+  // Then remove bare-name entries when we have a proper constituency version
+  const byKey = new Map();
+  for (const c of allCandidates) {
+    if (!c.name || c.name.length < 2) continue;
+    const key = `${c.name.trim().toLowerCase()}|${(c.constituency||'').trim().toLowerCase()}`;
+    const existing = byKey.get(key);
+    if (!existing || (c.votes||0) > (existing.votes||0)) byKey.set(key, c);
+  }
+  const withConst = new Set(
+    [...byKey.values()].filter(c => c.constituency).map(c => c.name.trim().toLowerCase())
+  );
+  for (const [key, c] of byKey.entries()) {
+    if (!c.constituency && withConst.has(c.name.trim().toLowerCase())) byKey.delete(key);
+  }
+  const unique = [...byKey.values()].sort((a, b) => (b.votes||0) - (a.votes||0));
 
   // Group by party for summary
   const partyMap = {};

@@ -25,7 +25,7 @@
   --purple: #BF5AF2;
 }
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--tx); font-family: 'Geist Mono', monospace; min-height: 100vh; }
+body { background: var(--bg); color: var(--tx); font-family: 'Geist Mono', monospace; min-height: 100vh; overflow-x: auto; }
 
 /* ── TICKER ── */
 .ticker { height: 34px; background: var(--red); display: flex; align-items: center; overflow: hidden; position: sticky; top: 0; z-index: 100; }
@@ -90,9 +90,9 @@ main { max-width: 1440px; margin: 0 auto; padding: 32px 48px 80px; }
 .cd span { color: var(--gold); }
 
 /* ── TABLE ── */
-.table-wrap { overflow-x: auto; }
+.table-wrap { width: 100%; }
 table { width: 100%; border-collapse: collapse; }
-thead { position: sticky; top: 34px; z-index: 10; }
+thead { position: sticky; top: 34px; z-index: 10; background: var(--s2); }
 thead th {
   background: var(--s2); border-bottom: 1px solid var(--b2);
   padding: 11px 16px; font-size: 9px; letter-spacing: 2.5px; color: var(--t3);
@@ -159,9 +159,11 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   header { padding: 28px 20px 24px; flex-direction: column; align-items: flex-start; }
-  main { padding: 20px 16px 60px; }
+  main { padding: 20px 12px 60px; }
   .summary { grid-template-columns: repeat(2, 1fr); }
   .hide-sm { display: none; }
+  table { min-width: 500px; }
+  .table-wrap { overflow-x: auto; }
 }
 </style>
 </head>
@@ -294,11 +296,10 @@ function fmtVotes(n) {
 }
 
 function statusBadge(status, votes) {
-  if (!status && !votes) return `<span class="status-badge status-trailing">PENDING</span>`;
   if (/won|winner/i.test(status)) return `<span class="status-badge status-won">✓ WON</span>`;
   if (/lead/i.test(status)) return `<span class="status-badge status-leading">▲ LEADING</span>`;
-  if (votes > 0) return `<span class="status-badge status-trailing">${fmtVotes(votes)} votes</span>`;
-  return `<span class="status-badge status-trailing">COUNTING</span>`;
+  if (votes > 0) return `<span class="status-badge status-trailing">COUNTING</span>`;
+  return `<span class="status-badge status-trailing">PENDING</span>`;
 }
 
 function applyFilters() {
