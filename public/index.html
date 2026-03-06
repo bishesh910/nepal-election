@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nepal Election 2082 — Live Results</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #DC2626;
+    --crimson: #9B1C1C;
+    --ink: #0F0F0F;
+    --paper: #F5F0E8;
+    --cream: #EDE8DC;
+    --gold: #B5830A;
+    --muted: #6B6560;
+    --border: #C8C0B0;
+    --green: #15803D;
+    --blue: #1D4ED8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* TICKER */
+  .ticker-wrap {
+    background: var(--red);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 8px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid #FF4444;
+  }
+  .ticker-label {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    padding: 0 18px;
+    font-size: 15px;
+    margin-right: 20px;
+    vertical-align: middle;
+  }
+  .ticker-track {
+    display: inline-block;
+    animation: ticker 60s linear infinite;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+  }
+  @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+
+  /* HEADER */
+  header {
+    padding: 0;
+    border-bottom: 1px solid #2A2A2A;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(220,38,38,0.08) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px);
+  }
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 32px 32px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
+  }
+  .flag-stripe {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    width: 48px;
+    height: 4px;
+  }
+  .flag-stripe span { flex: 1; }
+  .flag-stripe span:nth-child(1) { background: #DC143C; }
+  .flag-stripe span:nth-child(2) { background: #FFFFFF; }
+  .flag-stripe span:nth-child(3) { background: #003893; }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 7vw, 88px);
+    line-height: 0.92;
+    letter-spacing: -1px;
+    color: var(--paper);
+  }
+  h1 span.accent { color: var(--red); }
+  .subtitle {
+    font-family: 'Noto Serif', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .live-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 3px;
+    font-size: 16px;
+    color: var(--red);
+  }
+  .live-dot::before {
+    content: '';
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+  .meta-info {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.8;
+  }
+  .meta-info strong { color: var(--paper); }
+
+  /* LAYOUT */
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #171717;
+    border: 1px solid #2A2A2A;
+    padding: 12px 20px;
+    margin-bottom: 32px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .status-bar .countdown { color: var(--gold); font-weight: 500; }
+  .refresh-btn {
+    background: none;
+    border: 1px solid #3A3A3A;
+    color: var(--paper);
+    padding: 4px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .refresh-btn:hover { background: #2A2A2A; border-color: #555; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 4px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: #2A2A2A; }
+
+  /* PARTY TABLE */
+  .party-table-wrap {
+    margin-bottom: 48px;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead th {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 1px solid #2A2A2A;
+  }
+  thead th.num { text-align: right; }
+  tbody tr {
+    border-bottom: 1px solid #1C1C1C;
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: #171717; }
+  tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+  }
+  .rank-cell {
+    font-size: 11px;
+    color: #3A3A3A;
+    width: 32px;
+  }
+  .party-name-cell {
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .party-color-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .num-cell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .won-cell { color: var(--green); font-weight: 500; }
+  .lead-cell { color: var(--gold); }
+  .total-cell { color: var(--paper); font-weight: 600; }
+
+  .bar-cell { width: 120px; }
+  .bar-wrap {
+    height: 4px;
+    background: #2A2A2A;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s ease;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    padding: 60px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 2;
+  }
+  .empty-state strong { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: #3A3A3A; margin-bottom: 8px; }
+
+  /* RAW DATA PANEL */
+  .raw-panel {
+    background: #111;
+    border: 1px solid #2A2A2A;
+    padding: 24px;
+    margin-bottom: 48px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .raw-panel pre {
+    font-size: 12px;
+    color: #7A7A6A;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.8;
+  }
+
+  /* NEWS */
+  .news-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .news-item {
+    background: #111;
+    border-left: 3px solid var(--red);
+    padding: 14px 18px;
+    font-family: 'Noto Serif', serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #CCC;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* SOURCE NOTE */
+  .source-note {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #1C1C1C;
+    font-size: 11px;
+    color: #3A3A3A;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .source-note a { color: #555; text-decoration: underline; }
+
+  /* LOADING SPINNER */
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid #2A2A2A;
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .header-inner { grid-template-columns: 1fr; }
+    .live-badge { align-items: flex-start; }
+    main { padding: 24px 16px 60px; }
+    .bar-cell { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <span class="ticker-label">BREAKING</span>
+  <span class="ticker-track" id="tickerText">Loading live updates...</span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-bg"></div>
+  <div class="header-inner">
+    <div>
+      <div class="flag-stripe"><span></span><span></span><span></span></div>
+      <h1>Nepal<br>Election <span class="accent">2082</span></h1>
+      <p class="subtitle">Federal Parliament — Live counting results from election.ekantipur.com</p>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot">LIVE</div>
+      <div class="meta-info" id="metaInfo">
+        <strong>—</strong><br>
+        Loading...
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span id="statusLeft">⏳ Connecting to data source...</span>
+    <span>
+      Next refresh in <span class="countdown" id="countdown">30s</span>
+      &nbsp;&nbsp;
+      <button class="refresh-btn" onclick="fetchNow()">↺ REFRESH</button>
+    </span>
+  </div>
+
+  <!-- PARTY RESULTS -->
+  <div class="section-label">PARTY STANDINGS</div>
+  <div class="party-table-wrap" id="partySection">
+    <div class="empty-state"><span class="spinner"></span> Fetching results...</div>
+  </div>
+
+  <!-- RAW DATA (shown if structured data is sparse) -->
+  <div id="rawSection" style="display:none;">
+    <div class="section-label">RAW DATA FROM SOURCE</div>
+    <div class="raw-panel"><pre id="rawContent"></pre></div>
+  </div>
+
+  <!-- NEWS -->
+  <div id="newsSection" style="display:none;">
+    <div class="section-label">UPDATES</div>
+    <div class="news-grid" id="newsGrid"></div>
+  </div>
+
+  <div class="source-note">
+    <span>Data source: <a href="https://election.ekantipur.com/?lng=eng" target="_blank">election.ekantipur.com</a> — refreshed every 30 seconds via proxy server</span>
+    <span id="lastUpdated">—</span>
+  </div>
+</main>
+
+<script>
+const PARTY_COLORS = [
+  '#DC2626','#1D4ED8','#15803D','#D97706','#7C3AED',
+  '#DB2777','#0891B2','#65A30D','#EA580C','#6366F1',
+  '#0D9488','#F59E0B','#4F46E5','#10B981','#F97316',
+];
+
+let countdownVal = 30;
+let intervalId = null;
+let fetchedOnce = false;
+
+function fmt(n) {
+  const num = parseInt(n);
+  if (isNaN(num)) return n || '—';
+  return num.toLocaleString();
+}
+
+function renderParties(parties) {
+  if (!parties || parties.length === 0) return null;
+
+  const maxTotal = Math.max(...parties.map(p => parseInt(p.total) || parseInt(p.won) || 0), 1);
+
+  const rows = parties.map((p, i) => {
+    const total = parseInt(p.total) || (parseInt(p.won) || 0) + (parseInt(p.leading) || 0);
+    const pct = Math.round((total / maxTotal) * 100);
+    const color = PARTY_COLORS[i % PARTY_COLORS.length];
+    return `
+      <tr>
+        <td class="rank-cell">${i + 1}</td>
+        <td>
+          <div class="party-name-cell">
+            <span class="party-color-dot" style="background:${color}"></span>
+            ${p.name}
+          </div>
+        </td>
+        <td class="num-cell won-cell">${fmt(p.won)}</td>
+        <td class="num-cell lead-cell">${fmt(p.leading)}</td>
+        <td class="num-cell total-cell">${fmt(total) !== '0' ? fmt(total) : fmt(p.won)}</td>
+        <td class="bar-cell">
+          <div class="bar-wrap">
+            <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Party</th>
+          <th class="num">Won</th>
+          <th class="num">Leading</th>
+          <th class="num">Total</th>
+          <th class="num">Share</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function renderNews(newsItems) {
+  if (!newsItems || newsItems.length === 0) return;
+  document.getElementById('newsSection').style.display = 'block';
+  document.getElementById('newsGrid').innerHTML = newsItems
+    .map(n => `<div class="news-item">${n}</div>`)
+    .join('');
+}
+
+function renderTicker(newsItems, parties) {
+  let texts = [];
+  if (parties && parties.length > 0) {
+    texts = parties.slice(0, 5).map(p => 
+      `${p.name.toUpperCase()} — Won: ${fmt(p.won)} | Leading: ${fmt(p.leading)}`
+    );
+  }
+  if (newsItems && newsItems.length > 0) {
+    texts = [...texts, ...newsItems.slice(0, 5)];
+  }
+  if (texts.length === 0) texts = ['Live election results updating every 30 seconds'];
+  document.getElementById('tickerText').textContent = texts.join('  ·  ');
+}
+
+async function fetchData() {
+  try {
+    const res = await fetch('/api/results');
+    const data = await res.json();
+
+    fetchedOnce = true;
+    countdownVal = data.nextRefresh || 30;
+
+    // Update meta
+    const ft = data.fetchedAt ? new Date(data.fetchedAt) : new Date();
+    document.getElementById('metaInfo').innerHTML = 
+      `<strong>${ft.toLocaleDateString('en-NP', {day:'numeric',month:'short',year:'numeric'})}</strong><br>
+       Last pulled: ${ft.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+    document.getElementById('lastUpdated').textContent = `Fetched at ${ft.toLocaleTimeString()}`;
+
+    // Status
+    const cacheAge = data.cacheAge !== null ? `Cache age: ${data.cacheAge}s` : '';
+    const partyCount = data.parties?.length || 0;
+    document.getElementById('statusLeft').textContent = 
+      data.error 
+        ? `⚠ Scrape error: ${data.error}` 
+        : `✓ Connected — ${partyCount} parties${cacheAge ? ` | ${cacheAge}` : ''}`;
+
+    // Parties
+    const partyHtml = renderParties(data.parties);
+    if (partyHtml) {
+      document.getElementById('partySection').innerHTML = partyHtml;
+    } else {
+      document.getElementById('partySection').innerHTML = `
+        <div class="empty-state">
+          <strong>NO STRUCTURED DATA</strong>
+          The page loaded but party data couldn't be parsed.<br>
+          See raw data below. The site may use JavaScript rendering.<br>
+          <small style="color:#444;margin-top:8px;display:block">Page title: ${data.pageTitle || 'unknown'}</small>
+        </div>`;
+    }
+
+    // Raw data fallback
+    if (data.rawBlocks && data.rawBlocks.length > 0) {
+      document.getElementById('rawSection').style.display = 'block';
+      document.getElementById('rawContent').textContent = data.rawBlocks.join('\n\n---\n\n');
+    }
+
+    // News
+    renderNews(data.news);
+    renderTicker(data.news, data.parties);
+
+  } catch (e) {
+    document.getElementById('statusLeft').textContent = `✗ Connection error: ${e.message}`;
+    if (!fetchedOnce) {
+      document.getElementById('partySection').innerHTML = `
+        <div class="empty-state">
+          <strong>CONNECTION FAILED</strong>
+          Cannot reach proxy server. Make sure the Node.js server is running.
+        </div>`;
+    }
+  }
+}
+
+function fetchNow() {
+  fetchData();
+  countdownVal = 30;
+}
+
+function startCountdown() {
+  if (intervalId) clearInterval(intervalId);
+  intervalId = setInterval(() => {
+    countdownVal = Math.max(0, countdownVal - 1);
+    document.getElementById('countdown').textContent = `${countdownVal}s`;
+    if (countdownVal <= 0) {
+      fetchData();
+      countdownVal = 30;
+    }
+  }, 1000);
+}
+
+// Boot
+fetchData();
+startCountdown();
+</script>
+</body>
+</html>
