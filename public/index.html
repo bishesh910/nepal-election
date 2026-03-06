@@ -165,6 +165,99 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
   table { min-width: 500px; }
   .table-wrap { overflow-x: auto; }
 }
+
+/* ── PARTY RACE TAB ── */
+#tab-parties { display: none; }
+
+.race-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+}
+.race-title { font-family: 'Instrument Serif', serif; font-size: 22px; }
+.race-legend { display: flex; gap: 20px; font-size: 10px; color: var(--t3); letter-spacing: 2px; }
+.race-legend span { display: flex; align-items: center; gap: 6px; }
+.leg-box { width: 10px; height: 10px; border-radius: 1px; }
+
+.race-list { display: flex; flex-direction: column; gap: 6px; }
+
+.race-row {
+  display: grid;
+  grid-template-columns: 28px 220px 1fr 80px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--b1);
+  transition: background 0.15s;
+}
+.race-row:hover { background: var(--s1); padding-left: 8px; padding-right: 8px; margin: 0 -8px; border-radius: 2px; }
+
+.race-rank { font-size: 11px; color: var(--t3); text-align: center; }
+.race-rank.r1 { color: var(--gold); font-weight: 600; font-size: 13px; }
+.race-rank.r2 { color: var(--t2); }
+.race-rank.r3 { color: #CD7F32; }
+
+.race-info {}
+.race-name { font-family: 'Instrument Serif', serif; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.race-cands { font-size: 10px; color: var(--t3); margin-top: 2px; }
+
+.race-bars { position: relative; height: 28px; }
+.race-bar-won {
+  position: absolute; left: 0; top: 0; height: 100%;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 6px; font-size: 10px; font-weight: 600;
+  min-width: 2px; border-radius: 1px;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden; white-space: nowrap;
+}
+.race-bar-leading {
+  position: absolute; top: 0; height: 100%;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 6px; font-size: 10px;
+  border-radius: 1px;
+  transition: left 1.2s cubic-bezier(0.22, 1, 0.36, 1), width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden; white-space: nowrap;
+}
+
+.race-total {
+  text-align: right; font-family: 'Instrument Serif', serif; font-size: 22px; 
+  display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+}
+.race-total-num { line-height: 1; }
+.race-total-label { font-size: 9px; color: var(--t3); letter-spacing: 2px; font-family: 'Geist Mono', monospace; }
+
+.race-scale {
+  display: grid; grid-template-columns: 28px 220px 1fr 80px; gap: 14px;
+  padding: 0 0 8px; border-bottom: 1px solid var(--b2); margin-bottom: 12px;
+}
+.race-scale-labels {
+  display: flex; justify-content: space-between;
+  font-size: 9px; color: var(--t3); letter-spacing: 1px;
+}
+
+.race-summary-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px;
+}
+.rsc { background: var(--s1); border: 1px solid var(--b1); padding: 16px 20px; }
+.rsc-label { font-size: 9px; letter-spacing: 3px; color: var(--t3); margin-bottom: 6px; }
+.rsc-value { font-family: 'Instrument Serif', serif; font-size: 28px; }
+.rsc-sub { font-size: 10px; color: var(--t3); margin-top: 3px; }
+
+.sort-btns { display: flex; gap: 8px; }
+.sort-btn {
+  background: var(--s2); border: 1px solid var(--b1); color: var(--t3);
+  padding: 5px 14px; font-family: 'Geist Mono', monospace; font-size: 10px;
+  letter-spacing: 1px; cursor: pointer; transition: all 0.15s;
+}
+.sort-btn.active, .sort-btn:hover { border-color: var(--red); color: var(--red); }
+
+@media (max-width: 900px) {
+  .race-row { grid-template-columns: 24px 1fr 80px; }
+  .race-row .race-bars { display: none; }
+  .race-scale { grid-template-columns: 24px 1fr 80px; }
+  .race-scale .race-scale-labels { display: none; }
+  .race-summary-cards { grid-template-columns: 1fr 1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -218,6 +311,12 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
     </div>
   </div>
 
+  <!-- Tab bar -->
+  <div class="tab-bar" style="display:flex;gap:0;border-bottom:1px solid var(--b1);margin-bottom:0;">
+    <button class="tab-btn active" id="tbCandidates" onclick="switchTab('candidates')" style="padding:12px 24px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid var(--red);color:var(--tx);cursor:pointer;margin-bottom:-1px;">CANDIDATES</button>
+    <button class="tab-btn" id="tbParties" onclick="switchTab('parties')" style="padding:12px 24px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t3);cursor:pointer;margin-bottom:-1px;">PARTY RACE</button>
+  </div>
+
   <!-- Controls -->
   <div class="controls">
     <div class="search-wrap">
@@ -261,6 +360,43 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
 
   <!-- Pagination -->
   <div class="pagination" id="pagination"></div>
+
+  <!-- Parties Tab -->
+  <div id="tab-parties">
+    <div class="race-summary-cards" id="raceSummaryCards">
+      <div class="rsc"><div class="rsc-label">LEADING PARTY</div><div class="rsc-value" id="rscLeader">—</div><div class="rsc-sub" id="rscLeaderSub">—</div></div>
+      <div class="rsc"><div class="rsc-label">TOTAL PARTIES</div><div class="rsc-value" id="rscTotal">—</div><div class="rsc-sub">with candidates</div></div>
+      <div class="rsc"><div class="rsc-label">SEATS COUNTED</div><div class="rsc-value" id="rscSeats">—</div><div class="rsc-sub">won + leading</div></div>
+    </div>
+
+    <div class="race-header">
+      <div class="race-title">Party Standing — Seats Won &amp; Leading</div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div class="race-legend">
+          <span><div class="leg-box" style="background:var(--green)"></div> WON</span>
+          <span><div class="leg-box" style="background:var(--gold);opacity:0.7"></div> LEADING</span>
+        </div>
+        <div class="sort-btns">
+          <button class="sort-btn active" id="sortTotal" onclick="setRaceSort('total')">TOTAL</button>
+          <button class="sort-btn" id="sortWon" onclick="setRaceSort('won')">WON</button>
+          <button class="sort-btn" id="sortVotes" onclick="setRaceSort('votes')">VOTES</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="race-scale">
+      <div></div><div></div>
+      <div class="race-scale-labels" id="raceScaleLabels"></div>
+      <div></div>
+    </div>
+
+    <div class="race-list" id="raceList">
+      <div style="text-align:center;padding:60px;color:var(--t3);font-size:12px;">
+        <div class="spinner" style="margin:0 auto 12px"></div>Loading party data...
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -444,10 +580,144 @@ async function fetchData() {
     document.getElementById('tickerText').textContent = tickerParts.join('   ·   ');
 
     applyFilters();
+    if (activeTab === 'parties') renderPartyRace();
   } catch(e) {
     document.getElementById('statusMsg').textContent = `✗ ${e.message}`;
     document.getElementById('statusMsg').className = 'status-txt err';
   }
+}
+
+
+// ── TAB SWITCHING ──
+let activeTab = 'candidates';
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-parties').style.display = tab === 'parties' ? 'block' : 'none';
+  // candidates tab elements
+  ['controls','table-section'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = tab === 'candidates' ? '' : 'none';
+  });
+  // show/hide controls + table
+  document.querySelector('.controls').style.display = tab === 'candidates' ? 'flex' : 'none';
+  document.querySelector('.table-wrap').style.display = tab === 'candidates' ? '' : 'none';
+  document.querySelector('.pagination').style.display = tab === 'candidates' ? '' : 'none';
+
+  // Tab button styles
+  document.getElementById('tbCandidates').style.cssText = tab === 'candidates'
+    ? 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid var(--red);color:var(--tx);cursor:pointer;margin-bottom:-1px;'
+    : 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t3);cursor:pointer;margin-bottom:-1px;';
+  document.getElementById('tbParties').style.cssText = tab === 'parties'
+    ? 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid var(--red);color:var(--tx);cursor:pointer;margin-bottom:-1px;'
+    : 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t3);cursor:pointer;margin-bottom:-1px;';
+
+  if (tab === 'parties' && allCandidates.length > 0) renderPartyRace();
+}
+
+// ── PARTY RACE ──
+let raceSortKey = 'total';
+
+function setRaceSort(key) {
+  raceSortKey = key;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sort' + key.charAt(0).toUpperCase() + key.slice(1)).classList.add('active');
+  renderPartyRace();
+}
+
+function buildPartyData(candidates) {
+  const map = {};
+  for (const c of candidates) {
+    const p = c.party || 'Unknown';
+    if (!map[p]) map[p] = { name: p, won: 0, leading: 0, total: 0, totalVotes: 0, candidates: 0 };
+    map[p].candidates++;
+    map[p].totalVotes += c.votes || 0;
+    if (/won|winner/i.test(c.status)) map[p].won++;
+    else if (/lead/i.test(c.status)) map[p].leading++;
+    map[p].total = map[p].won + map[p].leading;
+  }
+  return Object.values(map);
+}
+
+function renderPartyRace() {
+  const parties = buildPartyData(allCandidates);
+
+  // Sort
+  parties.sort((a, b) => {
+    if (raceSortKey === 'won') return b.won - a.won || b.total - a.total;
+    if (raceSortKey === 'votes') return b.totalVotes - a.totalVotes;
+    return b.total - a.total || b.won - a.won;
+  });
+
+  // Filter out parties with no activity unless top 20
+  const active = parties.filter(p => p.total > 0 || p.totalVotes > 0).slice(0, 30);
+  if (active.length === 0) {
+    // Show all if nothing has votes yet (early counting)
+    active.push(...parties.slice(0, 20));
+  }
+
+  // Summary cards
+  const leader = active[0];
+  if (leader) {
+    document.getElementById('rscLeader').textContent = leader.name.length > 22 ? leader.name.substring(0, 20) + '…' : leader.name;
+    document.getElementById('rscLeaderSub').textContent = `${leader.total} seats (${leader.won} won, ${leader.leading} leading)`;
+  }
+  document.getElementById('rscTotal').textContent = parties.length;
+  const totalSeats = parties.reduce((s, p) => s + p.total, 0);
+  document.getElementById('rscSeats').textContent = totalSeats;
+
+  // Scale
+  const maxTotal = Math.max(...active.map(p => p.total), 1);
+  const maxVotes = Math.max(...active.map(p => p.totalVotes), 1);
+  const scaleMax = raceSortKey === 'votes' ? maxVotes : maxTotal;
+  const mid = Math.round(scaleMax / 2);
+  document.getElementById('raceScaleLabels').innerHTML =
+    `<span>0</span><span>${raceSortKey === 'votes' ? mid.toLocaleString() : mid}</span><span>${raceSortKey === 'votes' ? scaleMax.toLocaleString() : scaleMax} ${raceSortKey === 'votes' ? 'votes' : 'seats'}</span>`;
+
+  const rows = active.map((p, i) => {
+    const color = getPartyColor(p.name);
+    const rankClass = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+
+    let wonPct, leadPct, displayTotal;
+    if (raceSortKey === 'votes') {
+      wonPct = (p.totalVotes / maxVotes) * 100;
+      leadPct = 0;
+      displayTotal = p.totalVotes.toLocaleString();
+    } else {
+      wonPct = (p.won / maxTotal) * 100;
+      leadPct = (p.leading / maxTotal) * 100;
+      displayTotal = p.total;
+    }
+
+    const wonLabel = raceSortKey === 'votes' ? '' : (p.won > 0 ? p.won : '');
+    const leadLabel = raceSortKey === 'votes' ? '' : (p.leading > 0 ? p.leading : '');
+
+    // Stacked bar: won bar from 0, leading bar starts where won ends
+    const wonBarPct = wonPct;
+    const leadBarLeft = wonPct;
+    const leadBarWidth = leadPct;
+
+    return `<div class="race-row">
+      <div class="race-rank ${rankClass}">${i + 1}</div>
+      <div class="race-info">
+        <div class="race-name" title="${p.name}">${p.name}</div>
+        <div class="race-cands">${p.candidates} candidate${p.candidates !== 1 ? 's' : ''}</div>
+      </div>
+      <div class="race-bars">
+        <div class="race-bar-won" style="width:${wonBarPct.toFixed(1)}%;background:${color};opacity:0.9">
+          ${wonLabel ? `<span style="color:#fff">${wonLabel}</span>` : ''}
+        </div>
+        <div class="race-bar-leading" style="left:${leadBarLeft.toFixed(1)}%;width:${leadBarWidth.toFixed(1)}%;background:${color};opacity:0.45">
+          ${leadLabel ? `<span style="color:#fff">${leadLabel}</span>` : ''}
+        </div>
+      </div>
+      <div class="race-total">
+        <div class="race-total-num" style="color:${color}">${displayTotal}</div>
+        <div class="race-total-label">${raceSortKey === 'votes' ? 'VOTES' : 'SEATS'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('raceList').innerHTML = rows;
 }
 
 function fetchNow() { fetchData(); countdown = 60; }
@@ -464,3 +734,4 @@ fetchData();
 </script>
 </body>
 </html>
+
