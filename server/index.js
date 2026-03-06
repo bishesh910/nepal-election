@@ -114,49 +114,58 @@ const HEADERS = {
 };
 
 // ─── Candidate parser ─────────────────────────────────────────────────────────
+// HTML structure from ekantipur constituency pages:
+// <table>
+//   <tbody>
+//     <tr>
+//       <td><a class="candidate-name-link"><span>NAME</span></a></td>
+//       <td><a><span class="party-name">PARTY</span></a></td>
+//       <td><div class="votecount [won|lost|leading]"><p>VOTES</p></div></td>
+//     </tr>
+//   </tbody>
+// </table>
 function parseCandidatesFromHtml(html, meta) {
   const $ = cheerio.load(html);
   const candidates = [];
 
-  // ekantipur renders candidate rows with specific class patterns
-  // Try structured selectors first
   $('table tbody tr').each((i, el) => {
     const tds = $(el).find('td');
     if (tds.length < 3) return;
-    const name = $(tds[0]).text().trim();
-    const party = $(tds[1]).text().trim();
-    const votesRaw = $(tds[2]).text().replace(/,/g, '').trim();
+
+    // Name: inside <span> within the candidate link
+    const name = $(tds[0]).find('.candidate-name-link span, a span').first().text().trim()
+               || $(tds[0]).find('span').first().text().trim()
+               || $(tds[0]).text().trim();
+
+    // Party: inside <span class="party-name">
+    const party = $(tds[1]).find('.party-name').first().text().trim()
+                || $(tds[1]).find('span').last().text().trim()
+                || $(tds[1]).text().trim();
+
+    // Votes: inside <div class="votecount"><p>
+    const votesRaw = $(tds[2]).find('.votecount p, p').first().text().replace(/,/g, '').trim();
     const votes = parseInt(votesRaw) || 0;
-    const status = $(tds[3] || tds[2]).text().trim();
-    if (name && name.length > 2 && name.length < 80 && !/^\d+$/.test(name)) {
+
+    // Status: from votecount div class (won / leading / lost)
+    const vcClass = $(tds[2]).find('.votecount').attr('class') || '';
+    let status = '';
+    if (/won/i.test(vcClass)) status = 'won';
+    else if (/leading/i.test(vcClass)) status = 'leading';
+
+    if (name && name.length > 1 && name.length < 100 && !/^\d+$/.test(name)) {
       candidates.push({
-        name, party: party || null,
-        votes, status: status || '',
-        constituency: meta.constituency, district: meta.district, province: meta.province,
+        name,
+        party: party || 'Unknown',
+        votes,
+        status,
+        constituency: meta.constituency,
+        district: meta.district,
+        province: meta.province,
       });
     }
   });
 
-  // Try card/div-based layout
-  if (candidates.length === 0) {
-    $('[class*="candidate"],[class*="result-row"],[class*="cand-row"]').each((i, el) => {
-      const name = $(el).find('[class*="name"],[class*="cand-name"],h5,h6').first().text().trim();
-      const party = $(el).find('[class*="party"],[class*="party-name"]').first().text().trim();
-      const votesRaw = $(el).find('[class*="vote"],[class*="count"],[class*="total"]').first().text().replace(/,/g,'').trim();
-      const votes = parseInt(votesRaw) || 0;
-      const status = $(el).find('[class*="status"],[class*="win"],[class*="lead"]').first().text().trim();
-      if (name && name.length > 2 && name.length < 80) {
-        candidates.push({
-          name, party: party || null,
-          votes, status,
-          constituency: meta.constituency, district: meta.district, province: meta.province,
-        });
-      }
-    });
-  }
-
-  // Mark as Unknown only if truly no party found (not empty string from wrong selector)
-  return candidates.map(c => ({ ...c, party: c.party || 'Unknown' }));
+  return candidates;
 }
 
 // ─── Fetch one constituency page ─────────────────────────────────────────────
@@ -187,29 +196,34 @@ async function fetchPopularCandidates() {
     
     // Find all candidate rows - look for vote number patterns  
     // Common pattern on such pages: Rank | Name | Party | Votes | Lead/Win | Constituency
-    $('tr').each((i, el) => {
+    // Same table structure as constituency pages
+    $('table tbody tr').each((i, el) => {
       const tds = $(el).find('td');
-      if (tds.length < 4) return;
-      // Popular candidates table: rank | name | party | votes | constituency
-      const rank = $(tds[0]).text().trim();
-      if (!/^\d+$/.test(rank)) return; // skip header rows
-      const name = $(tds[1]).text().trim();
-      const party = $(tds[2]).text().trim();
-      const votesRaw = $(tds[3]).text().replace(/,/g,'').trim();
+      if (tds.length < 3) return;
+
+      const name = $(tds[0]).find('.candidate-name-link span, a span').first().text().trim()
+                 || $(tds[0]).find('span').first().text().trim()
+                 || $(tds[0]).text().trim();
+
+      const party = $(tds[1]).find('.party-name').first().text().trim()
+                  || $(tds[1]).find('span').last().text().trim()
+                  || $(tds[1]).text().trim();
+
+      const votesRaw = $(tds[2]).find('.votecount p, p').first().text().replace(/,/g, '').trim();
       const votes = parseInt(votesRaw) || 0;
-      const constituency = $(tds[4] || tds[3]).text().trim();
-      if (name && name.length > 2 && name.length < 80 && votes > 0) {
-        candidates.push({ name, party: party || 'Unknown', votes, status: '', constituency, district: '', province: '' });
-      }
-    });
-    // Also try card layout
-    $('[class*="popular"],[class*="top-cand"],[class*="candidate-card"]').each((i, el) => {
-      const name = $(el).find('[class*="name"],h5,h6,strong').first().text().trim();
-      const party = $(el).find('[class*="party"]').first().text().trim();
-      const votesRaw = $(el).find('[class*="vote"],[class*="count"]').first().text().replace(/,/g,'').trim();
-      const votes = parseInt(votesRaw) || 0;
-      if (name && name.length > 2 && votes > 0) {
-        candidates.push({ name, party: party || 'Unknown', votes, status: '', constituency: '', district: '', province: '' });
+
+      const vcClass = $(tds[2]).find('.votecount').attr('class') || '';
+      let status = '';
+      if (/won/i.test(vcClass)) status = 'won';
+      else if (/leading/i.test(vcClass)) status = 'leading';
+
+      // Try to get constituency from a rank/constituency column if present
+      const constituency = tds.length >= 4
+        ? $(tds[3]).find('a').text().trim() || $(tds[3]).text().trim()
+        : '';
+
+      if (name && name.length > 1 && name.length < 100 && votes > 0) {
+        candidates.push({ name, party: party || 'Unknown', votes, status, constituency, district: '', province: '' });
       }
     });
 
@@ -422,4 +436,3 @@ app.get('/api/results', async (req, res) => {
 app.get('/api/health', (req, res) => res.json({ ok: true, lastFetched, uptime: process.uptime() }));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
 app.listen(PORT, () => console.log(`Nepal Election server on port ${PORT}`));
-
