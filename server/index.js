@@ -276,9 +276,16 @@ async function fetchAllData() {
     if (c.name) c.name = c.name.replace(/\s+/g, ' ').trim();
   }
 
+  // Build a party lookup: name -> best known party (not Unknown)
+  const partyLookup = new Map();
+  for (const c of allCandidates) {
+    if (!c.name || !c.party || c.party === 'Unknown') continue;
+    const key = c.name.trim().toLowerCase();
+    if (!partyLookup.has(key)) partyLookup.set(key, c.party);
+  }
+
   // Deduplicate by name only — one entry per candidate, keep highest votes.
-  // The popular-candidates widget appears on EVERY constituency page, causing
-  // the same person to be scraped with a different constituency each time.
+  // Then reconcile Unknown parties using the lookup above.
   const byName = new Map();
   for (const c of allCandidates) {
     if (!c.name || c.name.length < 2) continue;
@@ -286,6 +293,14 @@ async function fetchAllData() {
     const existing = byName.get(key);
     if (!existing || (c.votes||0) > (existing.votes||0)) byName.set(key, c);
   }
+
+  // Reconcile: fill in Unknown party from lookup
+  for (const [key, c] of byName.entries()) {
+    if ((!c.party || c.party === 'Unknown') && partyLookup.has(key)) {
+      c.party = partyLookup.get(key);
+    }
+  }
+
   const unique = [...byName.values()].sort((a, b) => (b.votes||0) - (a.votes||0));
 
   // Group by party for summary
