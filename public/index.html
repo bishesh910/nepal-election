@@ -3,780 +3,460 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nepal Election 2082 — Live Results</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@300;400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<title>Nepal Election 2082 — Candidate Results</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #0A0A0F;
-  --surface: #111118;
-  --surface2: #18181F;
-  --border: #222230;
-  --border2: #2A2A3A;
-  --text: #E8E8F0;
-  --muted: #5A5A70;
-  --muted2: #3A3A50;
-  --red: #E63946;
-  --red-dim: rgba(230,57,70,0.12);
-  --gold: #F4A427;
-  --gold-dim: rgba(244,164,39,0.1);
-  --green: #2DC653;
-  --green-dim: rgba(45,198,83,0.1);
-  --blue: #4895EF;
-  --blue-dim: rgba(72,149,239,0.1);
-  --accent: #E63946;
+  --bg: #070709;
+  --s1: #0E0E12;
+  --s2: #14141A;
+  --s3: #1C1C24;
+  --b1: #1E1E28;
+  --b2: #2A2A38;
+  --b3: #3A3A50;
+  --tx: #EEEEF5;
+  --t2: #9090A8;
+  --t3: #50506A;
+  --red: #FF3B5C;
+  --gold: #FFB340;
+  --green: #30D158;
+  --blue: #40A9FF;
+  --purple: #BF5AF2;
 }
-
 html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+body { background: var(--bg); color: var(--tx); font-family: 'Geist Mono', monospace; min-height: 100vh; }
 
-/* ─── NOISE TEXTURE OVERLAY ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1000;
-  opacity: 0.4;
-}
+/* ── TICKER ── */
+.ticker { height: 34px; background: var(--red); display: flex; align-items: center; overflow: hidden; position: sticky; top: 0; z-index: 100; }
+.t-label { padding: 0 16px; font-size: 10px; letter-spacing: 3px; background: rgba(0,0,0,0.35); height: 100%; display: flex; align-items: center; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.15); }
+.t-scroll { flex: 1; overflow: hidden; }
+.t-inner { white-space: nowrap; font-size: 12px; animation: ticker 90s linear infinite; padding-left: 100%; }
+@keyframes ticker { to { transform: translateX(-100%); } }
 
-/* ─── TICKER ─── */
-.ticker {
-  background: var(--red);
-  overflow: hidden;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  height: 36px;
-}
-.ticker-label {
-  font-family: 'Playfair Display', serif;
-  font-size: 11px;
-  letter-spacing: 3px;
-  padding: 0 20px;
-  white-space: nowrap;
-  background: rgba(0,0,0,0.3);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  border-right: 1px solid rgba(255,255,255,0.2);
-}
-.ticker-scroll {
-  flex: 1;
-  overflow: hidden;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-.ticker-track {
-  white-space: nowrap;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  animation: scroll-ticker 80s linear infinite;
-  padding-left: 100%;
-}
-@keyframes scroll-ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-/* ─── HEADER ─── */
+/* ── HEADER ── */
 header {
-  border-bottom: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
+  padding: 48px 48px 36px;
+  border-bottom: 1px solid var(--b1);
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  background: linear-gradient(180deg, rgba(255,59,92,0.04) 0%, transparent 100%);
 }
-.header-glow {
-  position: absolute;
-  top: -100px; right: -100px;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(230,57,70,0.06) 0%, transparent 60%);
-  pointer-events: none;
-}
-.header-inner {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 48px 48px 40px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: end;
-  gap: 32px;
-}
-.nepal-flag {
-  display: flex;
-  gap: 3px;
-  margin-bottom: 24px;
-}
-.nepal-flag span {
-  height: 3px;
-  width: 28px;
-  border-radius: 2px;
-}
-.f1 { background: #DC143C; }
-.f2 { background: #FFFFFF; opacity: 0.6; }
-.f3 { background: #003893; }
+.h-left { display: flex; flex-direction: column; gap: 12px; }
+.flag { display: flex; gap: 4px; }
+.flag span { height: 3px; width: 24px; border-radius: 2px; }
+h1 { font-family: 'Instrument Serif', serif; font-size: clamp(42px, 5vw, 80px); line-height: 0.95; letter-spacing: -1px; }
+h1 i { color: var(--red); }
+.sub { font-size: 12px; color: var(--t2); letter-spacing: 1px; }
+.h-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.live { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 4px; color: var(--red); }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: pulse 1.8s ease infinite; }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
+.htime { font-size: 11px; color: var(--t3); text-align: right; line-height: 1.9; }
+.htime strong { color: var(--t2); }
 
-h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(48px, 6vw, 96px);
-  font-weight: 900;
-  line-height: 0.9;
-  letter-spacing: -2px;
-  color: var(--text);
-}
-h1 em {
-  font-style: italic;
-  color: var(--red);
-}
-.tagline {
-  font-family: 'Source Serif 4', serif;
-  font-style: italic;
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: 16px;
-  letter-spacing: 0.2px;
-}
+/* ── MAIN ── */
+main { max-width: 1440px; margin: 0 auto; padding: 32px 48px 80px; }
 
-.live-panel {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-end;
-}
-.live-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  letter-spacing: 4px;
-  color: var(--red);
-  font-weight: 500;
-}
-.live-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--red);
-  box-shadow: 0 0 0 0 rgba(230,57,70,0.4);
-  animation: live-pulse 2s ease infinite;
-}
-@keyframes live-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(230,57,70,0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(230,57,70,0); }
-  100% { box-shadow: 0 0 0 0 rgba(230,57,70,0); }
-}
-.timestamp {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.8;
-  text-align: right;
-}
-.timestamp strong { color: var(--text); display: block; font-size: 13px; }
+/* ── SUMMARY CARDS ── */
+.summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 36px; }
+.scard { background: var(--s1); border: 1px solid var(--b1); padding: 16px 20px; }
+.scard-label { font-size: 9px; letter-spacing: 3px; color: var(--t3); margin-bottom: 8px; }
+.scard-value { font-family: 'Instrument Serif', serif; font-size: 36px; line-height: 1; color: var(--tx); }
+.scard-sub { font-size: 10px; color: var(--t3); margin-top: 4px; }
 
-/* ─── MAIN ─── */
-main {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 40px 48px 100px;
+/* ── CONTROLS ── */
+.controls { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 360px; }
+.search-wrap input {
+  width: 100%; background: var(--s1); border: 1px solid var(--b1); color: var(--tx);
+  padding: 10px 16px 10px 38px; font-family: 'Geist Mono', monospace; font-size: 12px;
+  outline: none; transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--b3); }
+.search-wrap input::placeholder { color: var(--t3); }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--t3); font-size: 14px; }
+.filter-sel {
+  background: var(--s1); border: 1px solid var(--b1); color: var(--t2);
+  padding: 10px 14px; font-family: 'Geist Mono', monospace; font-size: 11px; outline: none; cursor: pointer;
+}
+.filter-sel:focus { border-color: var(--b3); }
+.ctrl-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.status-txt { font-size: 11px; color: var(--t3); }
+.status-txt.ok { color: var(--green); }
+.status-txt.err { color: var(--red); }
+.btn { background: var(--s2); border: 1px solid var(--b2); color: var(--t2); padding: 9px 18px; font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 1px; cursor: pointer; transition: all 0.15s; }
+.btn:hover { border-color: var(--red); color: var(--red); }
+.cd { font-size: 11px; color: var(--t3); }
+.cd span { color: var(--gold); }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead { position: sticky; top: 34px; z-index: 10; }
+thead th {
+  background: var(--s2); border-bottom: 1px solid var(--b2);
+  padding: 11px 16px; font-size: 9px; letter-spacing: 2.5px; color: var(--t3);
+  text-align: left; font-weight: 500; cursor: pointer; user-select: none; white-space: nowrap;
+}
+thead th:hover { color: var(--t2); }
+thead th.sort-asc::after { content: ' ↑'; color: var(--red); }
+thead th.sort-desc::after { content: ' ↓'; color: var(--red); }
+thead th.r { text-align: right; }
+
+tbody tr { border-bottom: 1px solid var(--b1); transition: background 0.1s; }
+tbody tr:hover { background: var(--s1); }
+tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
+
+.rank-cell { font-size: 11px; color: var(--t3); width: 40px; text-align: center; }
+.rank-1 { color: var(--gold); font-weight: 600; }
+.rank-2 { color: var(--t2); }
+.rank-3 { color: #CD7F32; }
+
+.cand-cell { display: flex; align-items: center; gap: 10px; }
+.cand-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-family: 'Instrument Serif', serif; flex-shrink: 0;
+  border: 1px solid var(--b2);
+}
+.cand-name { font-family: 'Instrument Serif', serif; font-size: 15px; }
+.cand-loc { font-size: 10px; color: var(--t3); margin-top: 2px; }
+
+.party-badge {
+  display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 2px;
+  border: 1px solid currentColor; letter-spacing: 0.5px; white-space: nowrap;
 }
 
-/* ─── CONTROLS ─── */
-.controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 40px;
-  padding: 0 0 20px;
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.status {
-  font-size: 12px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.status .ok { color: var(--green); }
-.status .err { color: var(--red); }
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  padding: 4px 12px;
-  font-size: 11px;
-  color: var(--muted);
-  border-radius: 2px;
-}
-.pill.gold { border-color: rgba(244,164,39,0.3); color: var(--gold); background: var(--gold-dim); }
-.pill.green { border-color: rgba(45,198,83,0.3); color: var(--green); background: var(--green-dim); }
+.votes-cell { text-align: right; }
+.votes-num { font-size: 15px; font-variant-numeric: tabular-nums; }
+.votes-bar-wrap { height: 2px; background: var(--b1); margin-top: 5px; border-radius: 1px; }
+.votes-bar { height: 100%; border-radius: 1px; transition: width 0.8s ease; }
 
-.ctrl-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; padding: 3px 10px; letter-spacing: 1px;
 }
-.countdown-ring {
-  position: relative;
-  width: 32px; height: 32px;
-}
-.countdown-ring svg {
-  transform: rotate(-90deg);
-}
-.countdown-ring .track { stroke: var(--border2); fill: none; }
-.countdown-ring .prog { fill: none; stroke: var(--red); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
-.countdown-num {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  color: var(--muted);
-}
-.btn-refresh {
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  color: var(--text);
-  padding: 7px 18px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-radius: 2px;
-}
-.btn-refresh:hover { background: var(--surface); border-color: var(--red); color: var(--red); }
+.status-won { background: rgba(48,209,88,0.1); color: var(--green); border: 1px solid rgba(48,209,88,0.2); }
+.status-leading { background: rgba(255,179,64,0.1); color: var(--gold); border: 1px solid rgba(255,179,64,0.2); }
+.status-trailing { background: var(--s2); color: var(--t3); border: 1px solid var(--b1); }
 
-/* ─── TABS ─── */
-.tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 32px;
-}
-.tab {
-  padding: 10px 24px;
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: var(--muted);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: all 0.2s;
-  background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  font-family: 'JetBrains Mono', monospace;
-}
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--text); border-bottom-color: var(--red); }
+.province-cell { font-size: 11px; color: var(--t2); }
+.constituency-cell { font-size: 11px; color: var(--t3); }
 
-/* ─── OVERVIEW PANEL ─── */
-.overview-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  margin-bottom: 40px;
-}
+/* ── PAGINATION ── */
+.pagination { display: flex; justify-content: center; gap: 8px; margin-top: 32px; align-items: center; }
+.page-btn { background: var(--s1); border: 1px solid var(--b1); color: var(--t2); padding: 7px 14px; font-family: 'Geist Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+.page-btn:hover, .page-btn.active { border-color: var(--red); color: var(--red); }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.page-info { font-size: 11px; color: var(--t3); padding: 0 8px; }
 
-/* Party leaderboard */
-.leaderboard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-.panel-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.panel-title {
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--muted);
-  font-weight: 500;
-}
-.party-row {
-  display: grid;
-  grid-template-columns: 24px 1fr 60px 60px 70px 140px;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 20px;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
-}
-.party-row:hover { background: var(--surface2); }
-.party-row:last-child { border-bottom: none; }
-.party-rank { font-size: 11px; color: var(--muted2); text-align: center; }
-.party-name-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-.party-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.party-name { font-family: 'Source Serif 4', serif; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.party-won { font-size: 14px; color: var(--green); font-weight: 500; text-align: right; }
-.party-leading { font-size: 14px; color: var(--gold); text-align: right; }
-.party-total { font-size: 15px; font-weight: 500; text-align: right; }
-.party-bar-wrap {
-  height: 3px;
-  background: var(--border2);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.party-bar { height: 100%; border-radius: 2px; transition: width 1s ease; }
-
-.party-header {
-  display: grid;
-  grid-template-columns: 24px 1fr 60px 60px 70px 140px;
-  gap: 12px;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-}
-.party-header span { font-size: 9px; letter-spacing: 2px; color: var(--muted2); }
-.party-header .r { text-align: right; }
-
-/* Stats sidebar */
-.stats-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 20px;
-}
-.stat-label { font-size: 9px; letter-spacing: 3px; color: var(--muted); margin-bottom: 10px; }
-.stat-value { font-family: 'Playfair Display', serif; font-size: 42px; line-height: 1; color: var(--text); }
-.stat-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
-
-.top3 { display: flex; flex-direction: column; gap: 10px; }
-.top3-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-}
-.top3-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.top3-name { font-family: 'Source Serif 4', serif; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.top3-num { font-size: 18px; font-weight: 500; }
-
-/* ─── DISTRICTS TAB ─── */
-.district-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
-}
-.district-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  transition: border-color 0.2s;
-}
-.district-card:hover { border-color: var(--border2); }
-.district-header {
-  padding: 14px 16px 12px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-.district-name {
-  font-family: 'Source Serif 4', serif;
-  font-size: 15px;
-  font-weight: 400;
-}
-.district-meta { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
-.district-parties { padding: 8px 0; }
-.dp-row {
-  display: grid;
-  grid-template-columns: 1fr 44px 44px;
-  padding: 6px 16px;
-  font-size: 12px;
-  gap: 8px;
-  align-items: center;
-  transition: background 0.1s;
-}
-.dp-row:hover { background: var(--surface2); }
-.dp-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #BBB; }
-.dp-won { text-align: right; color: var(--green); font-weight: 500; }
-.dp-lead { text-align: right; color: var(--gold); }
-.dp-header {
-  display: grid;
-  grid-template-columns: 1fr 44px 44px;
-  padding: 4px 16px 6px;
-  font-size: 9px;
-  gap: 8px;
-  letter-spacing: 2px;
-  color: var(--muted2);
-  border-bottom: 1px solid var(--border);
-}
-.dp-header span:last-child, .dp-header span:nth-child(2) { text-align: right; }
-
-/* ─── LOADING ─── */
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 0;
-  gap: 16px;
-  color: var(--muted);
-}
-.spinner {
-  width: 24px; height: 24px;
-  border: 2px solid var(--border2);
-  border-top-color: var(--red);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
+/* ── EMPTY / LOADING ── */
+.empty-row td { text-align: center; padding: 60px; color: var(--t3); font-size: 12px; }
+.spinner-row td { text-align: center; padding: 60px; }
+.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--b2); border-top-color: var(--red); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 11px; letter-spacing: 2px; }
 
-/* ─── LEGEND ─── */
-.legend { display: flex; gap: 24px; flex-wrap: wrap; padding: 16px 0; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
-.legend-dot { width: 8px; height: 8px; border-radius: 1px; }
-.l-won { background: var(--green); }
-.l-lead { background: var(--gold); }
-
-/* ─── EMPTY ─── */
-.empty { padding: 48px; text-align: center; color: var(--muted); font-size: 12px; line-height: 2; }
-
-/* ─── FOOTER ─── */
-footer {
-  border-top: 1px solid var(--border);
-  padding: 24px 48px;
-  max-width: 1440px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--muted2);
-}
-footer a { color: var(--muted); text-decoration: underline; }
-
-/* ─── RESPONSIVE ─── */
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  .header-inner { grid-template-columns: 1fr; padding: 32px 24px 28px; }
-  .live-panel { align-items: flex-start; }
-  main { padding: 24px 20px 60px; }
-  .overview-grid { grid-template-columns: 1fr; }
-  .party-row { grid-template-columns: 20px 1fr 50px 50px 60px; }
-  .party-row .party-bar-wrap { display: none; }
-  .party-header { grid-template-columns: 20px 1fr 50px 50px 60px; }
-  .party-header span:last-child { display: none; }
-  footer { padding: 20px 24px; flex-direction: column; gap: 8px; }
+  header { padding: 28px 20px 24px; flex-direction: column; align-items: flex-start; }
+  main { padding: 20px 16px 60px; }
+  .summary { grid-template-columns: repeat(2, 1fr); }
+  .hide-sm { display: none; }
 }
-
-/* fade-in animation */
-.fade-in { animation: fadein 0.4s ease; }
-@keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
 
-<!-- TICKER -->
 <div class="ticker">
-  <div class="ticker-label">LIVE</div>
-  <div class="ticker-scroll">
-    <div class="ticker-track" id="tickerTrack">Loading election data...</div>
-  </div>
+  <div class="t-label">LIVE</div>
+  <div class="t-scroll"><div class="t-inner" id="tickerText">Loading candidate data...</div></div>
 </div>
 
-<!-- HEADER -->
 <header>
-  <div class="header-glow"></div>
-  <div class="header-inner">
-    <div>
-      <div class="nepal-flag">
-        <span class="f1"></span><span class="f2"></span><span class="f3"></span>
-      </div>
-      <h1>Nepal<br>Election <em>2082</em></h1>
-      <p class="tagline">Federal Parliament — live counting results</p>
+  <div class="h-left">
+    <div class="flag">
+      <span style="background:#DC143C"></span>
+      <span style="background:rgba(255,255,255,0.4)"></span>
+      <span style="background:#003893"></span>
     </div>
-    <div class="live-panel">
-      <div class="live-indicator">
-        <div class="live-dot"></div>
-        LIVE
-      </div>
-      <div class="timestamp">
-        <strong id="hdrDate">—</strong>
-        <span id="hdrTime">Connecting...</span>
-      </div>
+    <h1>Nepal Election<br><i>2082</i></h1>
+    <p class="sub">FEDERAL PARLIAMENT — ALL CANDIDATES BY VOTES</p>
+  </div>
+  <div class="h-right">
+    <div class="live"><div class="live-dot"></div>LIVE</div>
+    <div class="htime">
+      <strong id="hdrDate">—</strong>
+      <span id="hdrTime">Connecting...</span>
     </div>
   </div>
 </header>
 
 <main>
-  <!-- CONTROLS -->
+  <!-- Summary -->
+  <div class="summary">
+    <div class="scard">
+      <div class="scard-label">TOTAL CANDIDATES</div>
+      <div class="scard-value" id="scTotal">—</div>
+      <div class="scard-sub">across all constituencies</div>
+    </div>
+    <div class="scard">
+      <div class="scard-label">SHOWING</div>
+      <div class="scard-value" id="scFiltered">—</div>
+      <div class="scard-sub" id="scFilteredSub">results</div>
+    </div>
+    <div class="scard">
+      <div class="scard-label">TOP VOTE-GETTER</div>
+      <div class="scard-value" id="scTopName" style="font-size:18px;margin-top:4px">—</div>
+      <div class="scard-sub" id="scTopVotes">—</div>
+    </div>
+    <div class="scard">
+      <div class="scard-label">CACHE AGE</div>
+      <div class="scard-value" id="scAge">—</div>
+      <div class="scard-sub">seconds since last fetch</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
   <div class="controls">
-    <div class="status">
-      <span id="statusMsg" class="ok">Connecting...</span>
-      <span class="pill gold" id="districtPill">0 districts</span>
-      <span class="pill green" id="seatsPill">0 seats reported</span>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search candidate or constituency..." oninput="onSearch()">
     </div>
+    <select class="filter-sel" id="provinceFilter" onchange="onFilter()">
+      <option value="">All Provinces</option>
+      <option>Koshi</option><option>Madhesh</option><option>Bagmati</option>
+      <option>Gandaki</option><option>Lumbini</option><option>Karnali</option><option>Sudurpaschim</option>
+    </select>
+    <select class="filter-sel" id="partyFilter" onchange="onFilter()">
+      <option value="">All Parties</option>
+    </select>
     <div class="ctrl-right">
-      <div class="countdown-ring">
-        <svg width="32" height="32" viewBox="0 0 32 32">
-          <circle class="track" cx="16" cy="16" r="13" stroke-width="2"/>
-          <circle class="prog" id="cdRing" cx="16" cy="16" r="13" stroke-width="2"
-            stroke-dasharray="81.68" stroke-dashoffset="0"/>
-        </svg>
-        <div class="countdown-num" id="cdNum">30</div>
-      </div>
-      <button class="btn-refresh" onclick="fetchNow()">↺ REFRESH</button>
+      <span class="cd">Refresh in <span id="cdSec">60</span>s</span>
+      <span id="statusMsg" class="status-txt">Connecting...</span>
+      <button class="btn" onclick="fetchNow()">↺ REFRESH</button>
     </div>
   </div>
 
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('overview', this)">OVERVIEW</button>
-    <button class="tab" onclick="switchTab('districts', this)">DISTRICTS</button>
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th class="r" onclick="sortBy('rank')">#</th>
+          <th onclick="sortBy('name')">CANDIDATE</th>
+          <th onclick="sortBy('party')">PARTY</th>
+          <th class="r" onclick="sortBy('votes')">VOTES</th>
+          <th onclick="sortBy('status')">STATUS</th>
+          <th class="hide-sm" onclick="sortBy('province')">PROVINCE</th>
+          <th class="hide-sm" onclick="sortBy('constituency')">CONSTITUENCY</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr class="spinner-row"><td colspan="7"><div class="spinner"></div></td></tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- OVERVIEW TAB -->
-  <div id="tab-overview">
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot l-won"></div> Won</div>
-      <div class="legend-item"><div class="legend-dot l-lead"></div> Leading</div>
-    </div>
-    <div class="overview-grid">
-      <!-- Leaderboard -->
-      <div class="leaderboard">
-        <div class="panel-header">
-          <span class="panel-title">PARTY STANDINGS</span>
-          <span style="font-size:10px;color:var(--muted)" id="partyCount">—</span>
-        </div>
-        <div class="party-header">
-          <span>#</span>
-          <span>PARTY</span>
-          <span class="r">WON</span>
-          <span class="r">LEAD</span>
-          <span class="r">TOTAL</span>
-          <span></span>
-        </div>
-        <div id="partyList">
-          <div class="loading-state">
-            <div class="spinner"></div>
-            <div class="loading-text">FETCHING DATA</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sidebar -->
-      <div class="stats-sidebar">
-        <div class="stat-card">
-          <div class="stat-label">DISTRICTS REPORTING</div>
-          <div class="stat-value" id="statDistricts">—</div>
-          <div class="stat-sub" id="statDistrictsSub">Loading...</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">SEATS REPORTED</div>
-          <div class="stat-value" id="statSeats">—</div>
-          <div class="stat-sub">seats counted so far</div>
-        </div>
-        <div class="stat-card" id="top3Card" style="display:none">
-          <div class="stat-label">TOP 3 PARTIES</div>
-          <div class="top3" id="top3List"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DISTRICTS TAB -->
-  <div id="tab-districts" style="display:none">
-    <div class="district-grid" id="districtGrid">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <div class="loading-text">LOADING DISTRICTS</div>
-      </div>
-    </div>
-  </div>
+  <!-- Pagination -->
+  <div class="pagination" id="pagination"></div>
 </main>
 
-<footer>
-  <span>Data source: <a href="https://election.ekantipur.com/?lng=eng" target="_blank">election.ekantipur.com</a> — proxied &amp; refreshed every 30s</span>
-  <span id="footerTime">—</span>
-</footer>
-
 <script>
-const COLORS = [
-  '#E63946','#4895EF','#2DC653','#F4A427','#A855F7',
-  '#EC4899','#06B6D4','#84CC16','#F97316','#6366F1',
-  '#14B8A6','#EAB308','#8B5CF6','#10B981','#FB923C',
-  '#3B82F6','#22C55E','#F59E0B','#EF4444','#8B5CF6',
+const PARTY_COLORS = [
+  '#FF3B5C','#40A9FF','#30D158','#FFB340','#BF5AF2',
+  '#FF6B6B','#00D2FF','#ADFF2F','#FFA500','#DA70D6',
+  '#00CED1','#FFD700','#7B68EE','#00FA9A','#FF7F50',
 ];
-const colorMap = {};
-function partyColor(name) {
-  if (!colorMap[name]) {
-    const idx = Object.keys(colorMap).length % COLORS.length;
-    colorMap[name] = COLORS[idx];
+const partyColorMap = {};
+let partyIdx = 0;
+function getPartyColor(party) {
+  if (!partyColorMap[party]) partyColorMap[party] = PARTY_COLORS[partyIdx++ % PARTY_COLORS.length];
+  return partyColorMap[party];
+}
+
+// State
+let allCandidates = [];
+let filtered = [];
+let currentPage = 1;
+const PER_PAGE = 50;
+let sortKey = 'votes';
+let sortDir = 'desc';
+let countdown = 60;
+let countdownInterval;
+
+function avatarInitials(name) {
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+
+function fmtVotes(n) {
+  if (!n) return '—';
+  return n.toLocaleString();
+}
+
+function statusBadge(status, votes) {
+  if (!status && !votes) return `<span class="status-badge status-trailing">PENDING</span>`;
+  if (/won|winner/i.test(status)) return `<span class="status-badge status-won">✓ WON</span>`;
+  if (/lead/i.test(status)) return `<span class="status-badge status-leading">▲ LEADING</span>`;
+  if (votes > 0) return `<span class="status-badge status-trailing">${fmtVotes(votes)} votes</span>`;
+  return `<span class="status-badge status-trailing">COUNTING</span>`;
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const prov = document.getElementById('provinceFilter').value.toLowerCase();
+  const party = document.getElementById('partyFilter').value.toLowerCase();
+  filtered = allCandidates.filter(c => {
+    if (q && !c.name.toLowerCase().includes(q) && !(c.constituency||'').toLowerCase().includes(q) && !(c.party||'').toLowerCase().includes(q)) return false;
+    if (prov && !(c.province||'').toLowerCase().includes(prov)) return false;
+    if (party && !(c.party||'').toLowerCase().includes(party)) return false;
+    return true;
+  });
+  // Apply sort
+  filtered.sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (sortKey === 'votes') { av = av || 0; bv = bv || 0; }
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  currentPage = 1;
+  render();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortKey = key; sortDir = key === 'votes' ? 'desc' : 'asc'; }
+  // Update header classes
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sort-asc','sort-desc'));
+  const ths = document.querySelectorAll('thead th');
+  const keyMap = { rank:0, name:1, party:2, votes:3, status:4, province:5, constituency:6 };
+  if (keyMap[key] !== undefined) {
+    ths[keyMap[key]].classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
   }
-  return colorMap[name];
+  applyFilters();
 }
 
-let countdown = 30;
-let intervalId = null;
-const CIRCUMFERENCE = 2 * Math.PI * 13; // ~81.68
+function render() {
+  const maxVotes = filtered.length > 0 ? Math.max(...filtered.map(c => c.votes||0), 1) : 1;
+  const start = (currentPage - 1) * PER_PAGE;
+  const page = filtered.slice(start, start + PER_PAGE);
 
-function setCountdown(val) {
-  countdown = val;
-  document.getElementById('cdNum').textContent = val;
-  const offset = CIRCUMFERENCE * (1 - val / 30);
-  document.getElementById('cdRing').style.strokeDashoffset = offset;
-}
+  document.getElementById('scFiltered').textContent = filtered.length.toLocaleString();
+  document.getElementById('scFilteredSub').textContent = filtered.length === allCandidates.length ? 'all candidates' : 'matching filters';
 
-function switchTab(name, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-overview').style.display = name === 'overview' ? '' : 'none';
-  document.getElementById('tab-districts').style.display = name === 'districts' ? '' : 'none';
-}
-
-function renderParties(parties) {
-  if (!parties || parties.length === 0) {
-    document.getElementById('partyList').innerHTML = '<div class="empty">No party data yet</div>';
+  if (page.length === 0) {
+    document.getElementById('tableBody').innerHTML = '<tr class="empty-row"><td colspan="7">No candidates found</td></tr>';
+    document.getElementById('pagination').innerHTML = '';
     return;
   }
-  document.getElementById('partyCount').textContent = `${parties.length} parties`;
-  const maxTotal = Math.max(...parties.map(p => p.total), 1);
 
-  const html = parties.map((p, i) => {
-    const color = partyColor(p.name);
-    const pct = Math.round((p.total / maxTotal) * 100);
-    return `<div class="party-row fade-in">
-      <div class="party-rank">${i + 1}</div>
-      <div class="party-name-wrap">
-        <div class="party-dot" style="background:${color}"></div>
-        <div class="party-name" title="${p.name}">${p.name}</div>
-      </div>
-      <div class="party-won">${p.won}</div>
-      <div class="party-leading">${p.leading}</div>
-      <div class="party-total">${p.total}</div>
-      <div class="party-bar-wrap">
-        <div class="party-bar" style="width:${pct}%;background:${color}"></div>
-      </div>
-    </div>`;
+  const rows = page.map((c, i) => {
+    const globalRank = start + i + 1;
+    const color = getPartyColor(c.party);
+    const pct = Math.round(((c.votes||0) / maxVotes) * 100);
+    const rankClass = globalRank === 1 ? 'rank-1' : globalRank === 2 ? 'rank-2' : globalRank === 3 ? 'rank-3' : '';
+    return `<tr>
+      <td class="rank-cell ${rankClass}">${globalRank}</td>
+      <td>
+        <div class="cand-cell">
+          <div class="cand-avatar" style="background:${color}18;color:${color};border-color:${color}30">${avatarInitials(c.name)}</div>
+          <div>
+            <div class="cand-name">${c.name}</div>
+            <div class="cand-loc">${c.district||c.constituency||''}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="party-badge" style="color:${color};border-color:${color}50">${c.party||'—'}</span></td>
+      <td class="votes-cell">
+        <div class="votes-num">${fmtVotes(c.votes)}</div>
+        <div class="votes-bar-wrap"><div class="votes-bar" style="width:${pct}%;background:${color}"></div></div>
+      </td>
+      <td>${statusBadge(c.status, c.votes)}</td>
+      <td class="province-cell hide-sm">${c.province||'—'}</td>
+      <td class="constituency-cell hide-sm">${c.constituency||'—'}</td>
+    </tr>`;
   }).join('');
-  document.getElementById('partyList').innerHTML = html;
 
-  // Top 3
-  const top3 = parties.slice(0, 3);
-  if (top3.length > 0) {
-    document.getElementById('top3Card').style.display = '';
-    document.getElementById('top3List').innerHTML = top3.map(p => `
-      <div class="top3-item">
-        <div class="top3-dot" style="background:${partyColor(p.name)}"></div>
-        <div class="top3-name" title="${p.name}">${p.name}</div>
-        <div class="top3-num" style="color:${partyColor(p.name)}">${p.total}</div>
-      </div>`).join('');
-  }
+  document.getElementById('tableBody').innerHTML = rows;
+  renderPagination();
 }
 
-function renderDistricts(districts) {
-  if (!districts || districts.length === 0) {
-    document.getElementById('districtGrid').innerHTML = '<div class="empty">No district data yet</div>';
-    return;
-  }
-  const html = districts.map(d => {
-    const active = d.parties.filter(p => p.total > 0);
-    const toShow = active.length > 0 ? active : d.parties.slice(0, 8);
-    const rows = toShow.map(p => `
-      <div class="dp-row">
-        <div class="dp-name" title="${p.name}">${p.name}</div>
-        <div class="dp-won">${p.won > 0 ? p.won : '—'}</div>
-        <div class="dp-lead">${p.leading > 0 ? p.leading : '—'}</div>
-      </div>`).join('');
-    return `<div class="district-card fade-in">
-      <div class="district-header">
-        <div class="district-name">${d.name}</div>
-        <div class="district-meta">${d.totalSeats} SEATS</div>
-      </div>
-      <div class="dp-header">
-        <span>PARTY</span><span>WON</span><span>LEAD</span>
-      </div>
-      <div class="district-parties">${rows}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('districtGrid').innerHTML = html;
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  if (total <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`;
+  const range = [];
+  for (let i = Math.max(1,currentPage-2); i <= Math.min(total,currentPage+2); i++) range.push(i);
+  if (range[0] > 1) html += `<button class="page-btn" onclick="goPage(1)">1</button>${range[0]>2?'<span class="page-info">…</span>':''}`;
+  range.forEach(p => html += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`);
+  if (range[range.length-1] < total) html += `${range[range.length-1]<total-1?'<span class="page-info">…</span>':''}<button class="page-btn" onclick="goPage(${total})">${total}</button>`;
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>→</button>`;
+  html += `<span class="page-info">Page ${currentPage} of ${total}</span>`;
+  document.getElementById('pagination').innerHTML = html;
 }
 
-function updateTicker(data) {
-  const parts = [];
-  if (data.globalParties && data.globalParties.length > 0) {
-    data.globalParties.slice(0, 6).forEach(p => {
-      parts.push(`${p.name.toUpperCase()}: ${p.won} won, ${p.leading} leading`);
-    });
-  }
-  if (data.news && data.news.length > 0) {
-    parts.push(...data.news.slice(0, 4));
-  }
-  if (parts.length === 0) parts.push('Nepal Federal Parliament Election 2082 — Live counting in progress');
-  document.getElementById('tickerTrack').textContent = parts.join('   ·   ');
+function goPage(p) {
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  currentPage = Math.max(1, Math.min(total, p));
+  window.scrollTo({ top: 200, behavior: 'smooth' });
+  render();
+}
+
+function onSearch() { clearTimeout(window._searchTimer); window._searchTimer = setTimeout(applyFilters, 250); }
+function onFilter() { applyFilters(); }
+
+function populatePartyFilter(candidates) {
+  const parties = [...new Set(candidates.map(c => c.party).filter(Boolean))].sort();
+  const sel = document.getElementById('partyFilter');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Parties</option>' + parties.map(p => `<option ${p===cur?'selected':''}>${p}</option>`).join('');
 }
 
 async function fetchData() {
   try {
-    const res = await fetch('/api/results');
+    const res = await fetch('/api/candidates?limit=2000');
     const data = await res.json();
 
-    // Header
+    allCandidates = data.candidates || [];
     const ft = new Date(data.fetchedAt);
-    document.getElementById('hdrDate').textContent = ft.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    document.getElementById('hdrTime').textContent = `Updated ${ft.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-    document.getElementById('footerTime').textContent = `Fetched: ${ft.toLocaleTimeString()}`;
+    document.getElementById('hdrDate').textContent = ft.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('hdrTime').textContent = `Updated ${ft.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+    document.getElementById('scTotal').textContent = (data.total || allCandidates.length).toLocaleString();
+    document.getElementById('scAge').textContent = data.cacheAge ?? '—';
+    document.getElementById('statusMsg').textContent = `✓ ${allCandidates.length} candidates`;
+    document.getElementById('statusMsg').className = 'status-txt ok';
+    countdown = data.nextRefresh || 60;
 
-    // Status
-    const dCount = data.districts?.length || 0;
-    const seats = data.totalSeatsReported || 0;
-    document.getElementById('statusMsg').textContent = data.error ? `Error: ${data.error}` : `✓ Connected`;
-    document.getElementById('statusMsg').className = data.error ? 'err' : 'ok';
-    document.getElementById('districtPill').textContent = `${dCount} districts`;
-    document.getElementById('seatsPill').textContent = `${seats} seats reported`;
+    // Top candidate
+    if (allCandidates.length > 0) {
+      const top = allCandidates[0];
+      document.getElementById('scTopName').textContent = top.name;
+      document.getElementById('scTopVotes').textContent = `${fmtVotes(top.votes)} votes`;
+    }
 
-    // Stats
-    document.getElementById('statDistricts').textContent = dCount || '—';
-    document.getElementById('statDistrictsSub').textContent = dCount > 0 ? `of 77 total districts` : 'No data yet';
-    document.getElementById('statSeats').textContent = seats || '—';
+    populatePartyFilter(allCandidates);
 
-    renderParties(data.globalParties);
-    renderDistricts(data.districts);
-    updateTicker(data);
+    // Ticker
+    const tickerParts = allCandidates.slice(0, 10).map(c => `${c.name.toUpperCase()} (${c.party}) — ${fmtVotes(c.votes)} votes · ${c.constituency}`);
+    document.getElementById('tickerText').textContent = tickerParts.join('   ·   ');
 
-    setCountdown(data.nextRefresh || 30);
-
-  } catch (e) {
+    applyFilters();
+  } catch(e) {
     document.getElementById('statusMsg').textContent = `✗ ${e.message}`;
-    document.getElementById('statusMsg').className = 'err';
+    document.getElementById('statusMsg').className = 'status-txt err';
   }
 }
 
-function fetchNow() {
-  fetchData();
-  setCountdown(30);
-}
+function fetchNow() { fetchData(); countdown = 60; }
 
-// Countdown ticker
-setInterval(() => {
-  const next = Math.max(0, countdown - 1);
-  setCountdown(next);
-  if (next === 0) { fetchData(); setCountdown(30); }
+// Countdown
+clearInterval(countdownInterval);
+countdownInterval = setInterval(() => {
+  countdown = Math.max(0, countdown - 1);
+  document.getElementById('cdSec').textContent = countdown;
+  if (countdown === 0) { fetchData(); countdown = 60; }
 }, 1000);
 
 fetchData();
