@@ -253,13 +253,18 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
   .race-summary-cards { grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 16px; }
   .rsc { padding: 10px 12px; }
   .rsc-value { font-size: 20px; }
-  .race-row { grid-template-columns: 22px 1fr 60px; gap: 8px; padding: 8px 0; }
-  .race-row .race-bars { display: none; }
-  .race-scale { display: none; }
+  .race-row { grid-template-columns: 22px 1fr 64px !important; gap: 8px; padding: 10px 0; }
+  .race-row .race-bars { display: none !important; }
+  .race-scale { display: none !important; }
   .race-name { font-size: 13px; white-space: normal; line-height: 1.3; }
+  .race-cands { font-size: 9px; }
+  .race-total { font-size: 18px; }
+  .race-total-num { font-size: 18px; }
   .race-header { flex-direction: column; align-items: flex-start; gap: 10px; }
   .sort-btns { width: 100%; display: flex; }
-  .sort-btn { flex: 1; text-align: center; padding: 8px 4px; font-size: 9px; }
+  .sort-btn { flex: 1; text-align: center; padding: 8px 4px; font-size: 9px; letter-spacing: 0; }
+  .race-title { font-size: 16px; }
+  #tab-parties { padding-top: 12px; }
 }
 
 
@@ -741,28 +746,36 @@ function toggleTheme() {
 
 // ── TAB SWITCHING ──
 let activeTab = 'candidates';
+const isMobile = () => window.innerWidth <= 600;
+
 function switchTab(tab) {
   activeTab = tab;
-  document.getElementById('tab-parties').style.display = tab === 'parties' ? 'block' : 'none';
-  // candidates tab elements
-  ['controls','table-section'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = tab === 'candidates' ? '' : 'none';
+  const onCandidates = tab === 'candidates';
+
+  // Party tab container
+  document.getElementById('tab-parties').style.display = onCandidates ? 'none' : 'block';
+
+  // Controls always visible
+  document.querySelector('.controls').style.display = onCandidates ? 'flex' : 'none';
+
+  // Table: only show on desktop when on candidates tab
+  document.querySelector('.table-wrap').style.display = (onCandidates && !isMobile()) ? '' : 'none';
+
+  // Card list: only show on mobile when on candidates tab
+  document.getElementById('cardList').style.display = (onCandidates && isMobile()) ? 'block' : 'none';
+
+  // Paginations
+  document.querySelectorAll('.pagination').forEach(el => {
+    el.style.display = onCandidates ? '' : 'none';
   });
-  // show/hide controls + table
-  document.querySelector('.controls').style.display = tab === 'candidates' ? 'flex' : 'none';
-  document.querySelector('.table-wrap').style.display = tab === 'candidates' ? '' : 'none';
-  document.querySelector('.pagination').style.display = tab === 'candidates' ? '' : 'none';
 
   // Tab button styles
-  document.getElementById('tbCandidates').style.cssText = tab === 'candidates'
-    ? 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid var(--red);color:var(--tx);cursor:pointer;margin-bottom:-1px;'
-    : 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t3);cursor:pointer;margin-bottom:-1px;';
-  document.getElementById('tbParties').style.cssText = tab === 'parties'
-    ? 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid var(--red);color:var(--tx);cursor:pointer;margin-bottom:-1px;'
-    : 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t3);cursor:pointer;margin-bottom:-1px;';
+  const activeStyle = 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid var(--red);color:var(--tx);cursor:pointer;margin-bottom:-1px;';
+  const inactiveStyle = 'padding:12px 24px;font-family:Geist Mono,monospace;font-size:10px;letter-spacing:2px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t3);cursor:pointer;margin-bottom:-1px;';
+  document.getElementById('tbCandidates').style.cssText = onCandidates ? activeStyle : inactiveStyle;
+  document.getElementById('tbParties').style.cssText = !onCandidates ? activeStyle : inactiveStyle;
 
-  if (tab === 'parties' && allCandidates.length > 0) renderPartyRace();
+  if (!onCandidates && allCandidates.length > 0) renderPartyRace();
 }
 
 // ── PARTY RACE ──
