@@ -366,7 +366,7 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
     <div class="race-summary-cards" id="raceSummaryCards">
       <div class="rsc"><div class="rsc-label">LEADING PARTY</div><div class="rsc-value" id="rscLeader">—</div><div class="rsc-sub" id="rscLeaderSub">—</div></div>
       <div class="rsc"><div class="rsc-label">TOTAL PARTIES</div><div class="rsc-value" id="rscTotal">—</div><div class="rsc-sub">with candidates</div></div>
-      <div class="rsc"><div class="rsc-label">SEATS COUNTED</div><div class="rsc-value" id="rscSeats">—</div><div class="rsc-sub">won + leading</div></div>
+      <div class="rsc"><div class="rsc-label">TOTAL VOTES COUNTED</div><div class="rsc-value" id="rscSeats" style="font-size:20px;margin-top:4px">—</div><div class="rsc-sub">across all parties</div></div>
     </div>
 
     <div class="race-header">
@@ -377,9 +377,9 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
           <span><div class="leg-box" style="background:var(--gold);opacity:0.7"></div> LEADING</span>
         </div>
         <div class="sort-btns">
-          <button class="sort-btn active" id="sortTotal" onclick="setRaceSort('total')">TOTAL</button>
+          <button class="sort-btn" id="sortTotal" onclick="setRaceSort('total')">TOTAL</button>
           <button class="sort-btn" id="sortWon" onclick="setRaceSort('won')">WON</button>
-          <button class="sort-btn" id="sortVotes" onclick="setRaceSort('votes')">VOTES</button>
+          <button class="sort-btn active" id="sortVotes" onclick="setRaceSort('votes')">VOTES</button>
         </div>
       </div>
     </div>
@@ -615,7 +615,7 @@ function switchTab(tab) {
 }
 
 // ── PARTY RACE ──
-let raceSortKey = 'total';
+let raceSortKey = 'votes';
 
 function setRaceSort(key) {
   raceSortKey = key;
@@ -663,7 +663,8 @@ function renderPartyRace() {
   }
   document.getElementById('rscTotal').textContent = parties.length;
   const totalSeats = parties.reduce((s, p) => s + p.total, 0);
-  document.getElementById('rscSeats').textContent = totalSeats;
+  const totalVotesAll = parties.reduce((s, p) => s + p.totalVotes, 0);
+  document.getElementById('rscSeats').textContent = raceSortKey === 'votes' ? totalVotesAll.toLocaleString() : totalSeats;
 
   // Scale
   const maxTotal = Math.max(...active.map(p => p.total), 1);
