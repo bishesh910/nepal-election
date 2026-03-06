@@ -149,7 +149,7 @@ function parseCandidatesFromHtml(html, meta) {
     // Status: from votecount div class (won / leading / lost)
     const vcClass = $(tds[2]).find('.votecount').attr('class') || '';
     let status = '';
-    if (/won/i.test(vcClass)) status = 'won';
+    if (/win/i.test(vcClass)) status = 'won';
     else if (/leading/i.test(vcClass)) status = 'leading';
 
     if (name && name.length > 1 && name.length < 100 && !/^\d+$/.test(name)) {
@@ -214,8 +214,8 @@ async function fetchPopularCandidates() {
 
       const vcClass = $(tds[2]).find('.votecount').attr('class') || '';
       let status = '';
-      if (/won/i.test(vcClass)) status = 'won';
-      else if (/leading/i.test(vcClass)) status = 'leading';
+    if (/win/i.test(vcClass)) status = 'won';
+    else if (/leading/i.test(vcClass)) status = 'leading';
 
       // Try to get constituency from a rank/constituency column if present
       const constituency = tds.length >= 4
@@ -282,7 +282,7 @@ async function fetchAllData() {
     if (c.status) {
       // Extract just the meaningful part: won/leading/trailing
       const s = c.status.replace(/\s+/g, ' ').trim();
-      if (/won|winner/i.test(s)) c.status = 'won';
+      if (/\bwin\b|winner/i.test(s)) c.status = 'won';
       else if (/lead/i.test(s)) c.status = 'leading';
       else c.status = '';
     }
@@ -373,7 +373,7 @@ async function fetchAllData() {
     if (!partyMap[p]) partyMap[p] = { name: p, candidates: 0, totalVotes: 0, won: 0, leading: 0 };
     partyMap[p].candidates++;
     partyMap[p].totalVotes += c.votes || 0;
-    if (/won|winner/i.test(c.status)) partyMap[p].won++;
+    if (c.status === 'won') partyMap[p].won++;
     else if (/lead/i.test(c.status)) partyMap[p].leading++;
   }
   const parties = Object.values(partyMap).sort((a, b) => b.totalVotes - a.totalVotes);
