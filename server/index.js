@@ -276,6 +276,41 @@ async function fetchAllData() {
     if (c.name) c.name = c.name.replace(/\s+/g, ' ').trim();
   }
 
+  // Hardcoded fallback for well-known politicians whose party only appears
+  // on the popular-candidates page (no constituency page entry to reconcile from)
+  const KNOWN_PARTIES = {
+    'rabi lamichhane': 'Rastriya Swatantra Party',
+    'pushpa kamal dahal': 'Nepal Communist Party (Maoist)',
+    'pushpa kamal dahal "prachanda"': 'Nepal Communist Party (Maoist)',
+    'kulman ghising': 'CPN-UML',
+    'sher bahadur deuba': 'Nepali Congress',
+    'kp sharma oli': 'CPN-UML',
+    'kp oli': 'CPN-UML',
+    'madhav kumar nepal': 'Nepal Communist Party (Sainyukta)',
+    'baburam bhattarai': 'Janamat Party',
+    'upendra yadav': 'Janata Samajbadi Party (Ekal Chunab Chinha)',
+    'mahantha thakur': 'Rastriya Janata Party Nepal',
+    'rajendra mahato': 'Janata Samjbadi Party-Nepal',
+    'bimalendra nidhi': 'Nepali Congress',
+    'ram chandra paudel': 'Nepali Congress',
+    'pradeep gywali': 'CPN-UML',
+    'bishnu paudel': 'CPN-UML',
+    'gagan thapa': 'Nepali Congress',
+    'minendra rijal': 'Nepali Congress',
+    'agni sapkota': 'Nepal Communist Party (Maoist)',
+    'dev gurung': 'Nepal Communist Party (Maoist)',
+    'hit bahadur tamang': 'Rastriya Prajatantra Party',
+    'tosima karki': 'Rastriya Swatantra Party',
+  };
+
+  // Apply known parties first
+  for (const c of allCandidates) {
+    if (!c.party || c.party === 'Unknown') {
+      const key = (c.name || '').trim().toLowerCase();
+      if (KNOWN_PARTIES[key]) c.party = KNOWN_PARTIES[key];
+    }
+  }
+
   // Build a party lookup: name -> best known party (not Unknown)
   const partyLookup = new Map();
   for (const c of allCandidates) {
@@ -294,10 +329,24 @@ async function fetchAllData() {
     if (!existing || (c.votes||0) > (existing.votes||0)) byName.set(key, c);
   }
 
-  // Reconcile: fill in Unknown party from lookup
+  // Build constituency/district lookup too
+  const metaLookup = new Map();
+  for (const c of allCandidates) {
+    if (!c.name || !c.constituency) continue;
+    const key = c.name.trim().toLowerCase();
+    if (!metaLookup.has(key)) metaLookup.set(key, { constituency: c.constituency, district: c.district, province: c.province });
+  }
+
+  // Reconcile: fill in Unknown party, missing constituency/district from lookups
   for (const [key, c] of byName.entries()) {
     if ((!c.party || c.party === 'Unknown') && partyLookup.has(key)) {
       c.party = partyLookup.get(key);
+    }
+    if (!c.constituency && metaLookup.has(key)) {
+      const m = metaLookup.get(key);
+      c.constituency = m.constituency;
+      c.district = m.district;
+      c.province = m.province;
     }
   }
 
@@ -373,3 +422,4 @@ app.get('/api/results', async (req, res) => {
 app.get('/api/health', (req, res) => res.json({ ok: true, lastFetched, uptime: process.uptime() }));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
 app.listen(PORT, () => console.log(`Nepal Election server on port ${PORT}`));
+
