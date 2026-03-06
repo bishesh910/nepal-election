@@ -253,22 +253,30 @@ async function fetchAllData() {
 
   console.log(`[scraper] Got ${allCandidates.length} total candidate entries from ${fetchedCount} constituencies`);
 
-  // Deduplicate: best (highest votes) per name+constituency
-  // Then remove bare-name entries when we have a proper constituency version
-  const byKey = new Map();
+  // Clean up messy status fields (raw HTML text blobs)
+  for (const c of allCandidates) {
+    if (c.status) {
+      // Extract just the meaningful part: won/leading/trailing
+      const s = c.status.replace(/\s+/g, ' ').trim();
+      if (/won|winner/i.test(s)) c.status = 'won';
+      else if (/lead/i.test(s)) c.status = 'leading';
+      else c.status = '';
+    }
+    // Clean name too
+    if (c.name) c.name = c.name.replace(/\s+/g, ' ').trim();
+  }
+
+  // Deduplicate by name only — one entry per candidate, keep highest votes.
+  // The popular-candidates widget appears on EVERY constituency page, causing
+  // the same person to be scraped with a different constituency each time.
+  const byName = new Map();
   for (const c of allCandidates) {
     if (!c.name || c.name.length < 2) continue;
-    const key = `${c.name.trim().toLowerCase()}|${(c.constituency||'').trim().toLowerCase()}`;
-    const existing = byKey.get(key);
-    if (!existing || (c.votes||0) > (existing.votes||0)) byKey.set(key, c);
+    const key = c.name.trim().toLowerCase();
+    const existing = byName.get(key);
+    if (!existing || (c.votes||0) > (existing.votes||0)) byName.set(key, c);
   }
-  const withConst = new Set(
-    [...byKey.values()].filter(c => c.constituency).map(c => c.name.trim().toLowerCase())
-  );
-  for (const [key, c] of byKey.entries()) {
-    if (!c.constituency && withConst.has(c.name.trim().toLowerCase())) byKey.delete(key);
-  }
-  const unique = [...byKey.values()].sort((a, b) => (b.votes||0) - (a.votes||0));
+  const unique = [...byName.values()].sort((a, b) => (b.votes||0) - (a.votes||0));
 
   // Group by party for summary
   const partyMap = {};
