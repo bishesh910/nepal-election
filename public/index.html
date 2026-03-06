@@ -46,7 +46,7 @@
   --shadow: rgba(0,0,0,0.12);
 }
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--tx); font-family: 'Geist Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+body { background: var(--bg); color: var(--tx); font-family: 'Geist Mono', monospace; min-height: 100vh; }
 
 /* ── TICKER ── */
 .ticker { height: 34px; background: var(--red); display: flex; align-items: center; overflow: hidden; position: sticky; top: 0; z-index: 100; }
@@ -177,20 +177,35 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
 .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--b2); border-top-color: var(--red); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── RESPONSIVE ── */
+/* ── MOBILE CARD LAYOUT ── */
+.card-list { display: none; }
+.mob-card {
+  background: var(--s1); border: 1px solid var(--b1);
+  padding: 12px 14px; margin-bottom: 6px;
+  display: grid; grid-template-columns: 32px 1fr auto;
+  gap: 10px; align-items: center;
+}
+.mob-rank { font-size: 11px; color: var(--t3); text-align: center; font-variant-numeric: tabular-nums; }
+.mob-rank.r1 { color: var(--gold); font-weight: 600; }
+.mob-rank.r2 { color: var(--t2); }
+.mob-rank.r3 { color: #CD7F32; }
+.mob-main { min-width: 0; }
+.mob-name { font-family: 'Instrument Serif', serif; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mob-meta { font-size: 10px; color: var(--t3); margin-top: 2px; display: flex; gap: 8px; flex-wrap: wrap; }
+.mob-party { font-size: 10px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mob-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.mob-votes { font-family: 'Instrument Serif', serif; font-size: 18px; line-height: 1; font-variant-numeric: tabular-nums; }
+.mob-status { }
 
-/* Tablet */
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  header { padding: 24px 20px 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
+  header { padding: 24px 20px 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
   h1 { font-size: clamp(36px, 8vw, 56px); }
   main { padding: 16px 16px 60px; }
   .summary { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; }
   .scard { padding: 12px 14px; }
   .scard-value { font-size: 28px; }
   .hide-sm { display: none; }
-  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { min-width: 480px; }
-  .controls { gap: 8px; }
   .race-summary-cards { grid-template-columns: repeat(2, 1fr); }
   .race-row { grid-template-columns: 24px 1fr 70px; }
   .race-scale { grid-template-columns: 24px 1fr 70px; }
@@ -198,66 +213,53 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
   .race-scale .race-scale-labels { display: none; }
 }
 
-/* Mobile */
 @media (max-width: 600px) {
   /* Header */
-  header { padding: 16px 16px 16px; gap: 12px; }
-  h1 { font-size: clamp(32px, 9vw, 48px); line-height: 1; }
-  .sub { font-size: 10px; }
-  .h-right { flex-direction: row; align-items: center; gap: 12px; }
+  header { padding: 14px 16px; gap: 10px; }
+  h1 { font-size: clamp(30px, 9vw, 44px); }
+  .sub { font-size: 9px; letter-spacing: 0.5px; }
   .htime { display: none; }
 
   /* Main */
-  main { padding: 12px 12px 80px; }
+  main { padding: 10px 10px 80px; }
 
-  /* Summary: 2x2 grid */
-  .summary { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+  /* Summary */
+  .summary { grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 14px; }
   .scard { padding: 10px 12px; }
-  .scard-label { font-size: 8px; letter-spacing: 2px; }
-  .scard-value { font-size: 24px; }
+  .scard-label { font-size: 8px; letter-spacing: 1.5px; }
+  .scard-value { font-size: 22px; }
   .scard-sub { font-size: 9px; }
 
-  /* Tab bar */
-  .tab-bar button { padding: 10px 16px !important; font-size: 9px !important; letter-spacing: 1px !important; }
+  /* Tabs */
+  .tab-bar button { padding: 10px 14px !important; font-size: 9px !important; letter-spacing: 1px !important; }
 
-  /* Controls: stack vertically */
+  /* Controls */
   .controls { flex-direction: column; align-items: stretch; gap: 8px; }
   .search-wrap { max-width: 100%; }
-  .filter-sel { width: 100%; }
-  .ctrl-right { margin-left: 0; justify-content: space-between; }
-  .cd { font-size: 10px; }
-  .btn { padding: 8px 14px; font-size: 10px; }
+  .filter-sel { width: 100%; font-size: 12px; padding: 10px 12px; }
+  .ctrl-right { margin-left: 0; justify-content: space-between; width: 100%; }
 
-  /* Table: scrollable, compact */
-  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--b1); }
-  table { min-width: 400px; }
-  tbody td { padding: 10px 10px; font-size: 12px; }
-  thead th { padding: 9px 10px; font-size: 8px; letter-spacing: 1.5px; }
-  .cand-avatar { width: 28px; height: 28px; font-size: 11px; }
-  .cand-name { font-size: 13px; }
-  .cand-loc { font-size: 9px; }
-  .votes-num { font-size: 13px; }
-  .party-badge { font-size: 9px; padding: 2px 6px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
-  .status-badge { font-size: 9px; padding: 2px 7px; }
+  /* Hide table, show cards */
+  .table-wrap { display: none; }
+  .scroll-hint { display: none !important; }
+  .card-list { display: block; }
 
-  /* Pagination: compact */
-  .pagination { gap: 4px; flex-wrap: wrap; margin-top: 20px; }
+  /* Pagination */
+  .pagination { gap: 4px; flex-wrap: wrap; margin-top: 16px; }
   .page-btn { padding: 6px 10px; font-size: 10px; }
+  .page-info { font-size: 10px; }
 
-  /* Party race: single column */
-  .race-summary-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; }
+  /* Party race */
+  .race-summary-cards { grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 16px; }
   .rsc { padding: 10px 12px; }
-  .rsc-value { font-size: 22px; }
+  .rsc-value { font-size: 20px; }
   .race-row { grid-template-columns: 22px 1fr 60px; gap: 8px; padding: 8px 0; }
   .race-row .race-bars { display: none; }
   .race-scale { display: none; }
   .race-name { font-size: 13px; white-space: normal; line-height: 1.3; }
-  .race-cands { font-size: 9px; }
-  .race-total { font-size: 18px; }
-  .race-total-label { font-size: 8px; }
   .race-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .sort-btns { width: 100%; }
-  .sort-btn { flex: 1; text-align: center; padding: 7px 8px; font-size: 9px; }
+  .sort-btns { width: 100%; display: flex; }
+  .sort-btn { flex: 1; text-align: center; padding: 8px 4px; font-size: 9px; }
 }
 
 
@@ -465,6 +467,10 @@ tbody td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
   <!-- Pagination -->
   <div class="pagination" id="pagination"></div>
 
+  <!-- Mobile card list -->
+  <div class="card-list" id="cardList"></div>
+  <div class="pagination" id="paginationMob" style="display:none"></div>
+
   <!-- Parties Tab -->
   <div id="tab-parties">
     <div class="race-summary-cards" id="raceSummaryCards">
@@ -621,7 +627,31 @@ function render() {
   }).join('');
 
   document.getElementById('tableBody').innerHTML = rows;
+  renderCards(page, start, maxVotes);
   renderPagination();
+}
+
+function renderCards(page, start, maxVotes) {
+  const cards = page.map((c, i) => {
+    const globalRank = start + i + 1;
+    const color = getPartyColor(c.party);
+    const rankClass = globalRank === 1 ? 'r1' : globalRank === 2 ? 'r2' : globalRank === 3 ? 'r3' : '';
+    const badge = statusBadge(c.status, c.votes);
+    const loc = [c.district, c.constituency].filter(Boolean).join(' · ');
+    return `<div class="mob-card">
+      <div class="mob-rank ${rankClass}">${globalRank}</div>
+      <div class="mob-main">
+        <div class="mob-name">${c.name}</div>
+        <div class="mob-meta"><span>${c.province||''}</span>${loc ? '<span>'+loc+'</span>' : ''}</div>
+        <div class="mob-party" style="color:${color}">${c.party||'—'}</div>
+      </div>
+      <div class="mob-right">
+        <div class="mob-votes" style="color:${color}">${fmtVotes(c.votes)}</div>
+        <div class="mob-status">${badge}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('cardList').innerHTML = cards;
 }
 
 function renderPagination() {
@@ -866,3 +896,4 @@ fetchData();
 </script>
 </body>
 </html>
+
